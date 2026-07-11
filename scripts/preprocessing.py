@@ -42,57 +42,6 @@ print("\n=== TITRES D'ORIGINE (originagenda_title) ===")
 for to, count in tos_compte.most_common():
     print(f"{to}: {count}")
 
-# === TITRES D'ORIGINE (originagenda_title) ===
-# Journées européennes du patrimoine 2026 - Grand Est: 1017
-# Mes événements France Travail: 968
-# Bien grandir dans le Saulnois: 63
-# Office de Tourisme de la Région de Rambervillers: 55
-# Biblis en folie 2026: 55
-# SCARE - Syndicat des Cinémas d'Art, de Répertoire et d'Essai: 48
-# Nuit Internationale de la Chauve-Souris: 19
-# Unidivers Oui sortir, vos deux agendas !: 17
-# Département de la Haute-Marne: 16
-# Bicentenaire de la Photographie - 2026-2027: 13
-# TCM - Théâtre de Charleville-Mézières: 12
-# Saison Méditerranée 2026: 11
-# Agenda culturel Grand-Est: 10
-# Carolo Mag: 10
-# La Kunsthalle Mulhouse - Centre d'Art Contemporain d'Intérêt National: 9
-# Saint-Dizier: 7
-# Ardenne Métropole: 6
-# [Archive] Journées européennes du patrimoine 2025 : Grand Est: 5
-# Hormur - Plateforme d'événements artistiques dans des lieux non conventionnels: 5
-# Visite d'une chapelle de style néogothique et de style byzantin: 4
-# Mécénat en Grand Est: 4
-# Rencontres & dédicaces du Hall du Livre Nancy: 4
-# Chambre d'agriculture de la Moselle: 4
-# Chambre d'Agriculture des Vosges: 4
-# Tableau de bord - Agenda du Département théâtre - Service régional de la création - Drac Île-de-France: 3
-# Chambre d'agriculture de la Meurthe-et-Moselle: 2
-# Mois de l'architecture/Journées nationales de l’architecture 2026 : Grand Est: 2
-# La Semaine de la Forme 2026: 2
-# Vivre le patrimoine culturel immatériel : Grand Est: 2
-# Agence C'est à Dire: 2
-# Parc de Wesserling: 2
-# Chambre d'agriculture Grand-Est: 1
-# Site archéologique départemental de Grand: 1
-# [Archives] Journées européennes du patrimoine 2024 : Grand Est: 1
-# Stimultania: 1
-# Bibliothèque nationale et universitaire de Strasbourg - Bnu: 1
-# Api'Week 2026: 1
-# France-Belgique - Calendrier des évènements économiques et sectoriels: 1
-# Ensemble, dialoguons - Édition 2026 | Banque de France: 1
-# Chambre d'agriculture de la Meuse: 1
-# QueFaire: 1
-# Musée Electropolis: 1
-# EcoNature: 1
-# Les 3 Scènes: 1
-# Accueil agenda spectacle vivant - DRAC : Nouvelle-Aquitaine: 1
-# Halle Verrière: 1
-# Ambassadeurs IA: 1
-# Musée de Saint-Dizier: 1
-# MUSE Saint-Dizier: 1
-
 # Au final pour filtrer les évènements on passera par le titre original qui est plus information, comparé aux mots clés qui sont parfois nuls 
 
 # Evènements à exclure
@@ -109,9 +58,12 @@ agenda_a_exclure = [
 
 ge_events_data_filtre = []
 for e in ge_events:
-    if "Archive" in e.get("originagenda_title"):
+    origin = e.get("originagenda_title") or ""
+    if "Archive" in origin: # ignorer les évènements "Archives"
         continue
-    if e.get("originagenda_title") not in agenda_a_exclure:
+    if origin in agenda_a_exclure: # ignorer les évènements non culturels
+        continue
+    if origin not in agenda_a_exclure:
         ge_events_data_filtre.append(e)
 print(len(ge_events))
 print(len(ge_events_data_filtre))
@@ -120,7 +72,16 @@ print(len(ge_events_data_filtre))
 with open("data/ge_events_data_filtre.json", "w", encoding="utf-8") as f:
     json.dump(ge_events_data_filtre, f, ensure_ascii=False, indent=4)
 
-# # Compter les occurrences titre origine
+# Les mots clés après filtre
+liste_kws = []
+
+for e in ge_events_data_filtre:
+    kw = e.get("keywords_fr") or []
+    liste_kws.extend(kw)
+
+kws_compte = Counter(liste_kws)
+
+# Compter les occurrences titre origine
 liste_to = []
 tos_compte = {}  
 
@@ -131,8 +92,8 @@ for e in ge_events_data_filtre:
 tos_compte = Counter(liste_to)  
 
 print("\n=== MOTS-CLÉS après filtre ===")
-for kw, count in kws_compte.most_common():
-    print(f"{kw}: {count}")
+for cle, count in kws_compte.most_common():
+    print(f"{cle}: {count}")
 
 print("\n=== TITRES D'ORIGINE après filtre ===")
 for to, count in tos_compte.most_common():
