@@ -4,17 +4,14 @@ import numpy as np
 import faiss
 
 # Chargement des chnks
-with open("./data/chunks.pkl", "rb") as f:
-    chunks = pickle.load(f)
+with open("./data/embeddings.pkl", "rb") as f:
+    data = pickle.load(f)
 
-# Génération des embeddings pour chaque document
-embeddings = []
+print(f"Nombre d'embeddings chargés : {len(data)}")
 
-for e in chunks:
-    embeddings.append(e["chunk"])   # <-- boucle simple comme tu voulais
-
-vectors = np.array(embeddings).astype("float32")
-print("Taille des vecteurs :", embeddings.shape)
+# Extraire les vecteurs
+vectors = np.array([d["embedding"] for d in data]).astype("float32")
+print("Taille des vecteurs :", vectors.shape)
 
 # Initialisation de l'index Faiss
 dimension = vectors.shape[1]
@@ -25,6 +22,7 @@ index.add(vectors)
 
 # Sauvegarde de l'index sur le disque
 faiss.write_index(index, "./faiss_index/faiss.idx")
+print("Index sauvegardé dans faiss_index/faiss.idx")
 
 # Sauvegarde des métadonnées
 metadata = [
@@ -34,7 +32,7 @@ metadata = [
         "date": e["date"],
         "canonicalurl": e["canonicalurl"],
         "chunk": e["chunk"]}
-    for e in embeddings]
+    for e in data]
 
 with open("./faiss_index/metadata.pkl", "wb") as f:
     pickle.dump(metadata, f)

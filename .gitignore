@@ -1,1 +1,4 @@
 .env
+data/embeddings.pkl
+faiss_index/*.idx
+faiss_index/*.pkl
