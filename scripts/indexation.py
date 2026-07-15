@@ -30,9 +30,13 @@ metadata = [
         "title": e["title"],
         "city": e["city"],
         "date": e["date"],
+        "lastdate_end": e["lastdate_end"],
+        "est_actif": e["est_actif"],
         "canonicalurl": e["canonicalurl"],
         "chunk": e["chunk"]}
     for e in data]
 
 with open("./faiss_index/metadata.pkl", "wb") as f:
     pickle.dump(metadata, f)
+
+    

@@ -53,30 +53,65 @@ Depuis la racine du projet: `python scripts/extract.py`
 
 Le fichier généré est enregistré dans: `data/grand_est_events.json`.
 
+## Indexation - FAISS (Preprocessing > Chunking > Embedding)
+### Preprocessing - Nettoyage et construction du texte RAG
 
+Le script `preprocessing.py`:
+- Charge les évènements bruts: `data/grand_est_events.json` 
+- Analyse les mots-clés et titres pour identifier les sources non pertinentes
+- Filtre les évènements (archives, évènements institutionnels, etc.)
+- Conserve uniquement les champs utiles au chatbot (titre, description, lieu, dates, âge, lien…)
+- Ajoute un champ event_actif basé sur la date de fin
+- Construit un champ textuel complet texte_rag utilisé pour le RAG
+- Exporte les données nettoyées au format JSON + CSV: 
 
+`data/ge_event_rag.json, data/ge_events_df.csv`.
 
+### Chunking - Découpage des textes
+Le script `chunk.py` quant à lui:
 
+- Récupère le dataframe des évènements filtrés précédemment `data/ge_events_df.csv`
+- Utilise `RecursiveCharacterTextSplitter` pour découper le **document** *texte_rag* en segments:
 
+    - taille des segments: `chunk_size = 700`
+    - recouvrement: `chunk_overlap = 200`
 
+- Génère une liste de chunks contenant:
 
+    - métadonnées (uid, titre, ville, dates…)
 
+    - texte du chunk
 
+- Sauvegarde les chunks dans un fichier pickle: `data/chunks.pkl`.
 
+### Embedding - Vectorisation des chunks
+- Chargement des chunks
+- Initialisation du client Mistral (`mistral-embed`)
+- Vectorisation des chunks par batch de 64
+- Gestion automatique des erreurs de rate limit
+- Construit une structure contenant:
 
+    - métadonnées
 
+    - chunk de texte
 
-* il conserve la structure complète de chaque événement
-* chaque événement peut être traité comme un document indépendant
-* les métadonnées (titre, description, dates, lieu, mots-clés, lien, etc.) sont préservées et pourront être utilisées lors de l'indexation et de la recherche documentaire
-* il est directement exploitable avec les bibliothèques Python utilisées pour le prétraitement des données et la création de la base vectorielle.
+    - embedding vectoriel
 
-### Prétraitement
+- Sauvegarde le tout dans `embeddings.pkl`.
 
-Après l'export, un prétraitement sera réalisé afin de nettoyer les données et de sélectionner les événements les plus pertinents pour le chatbot. Cette étape pourra notamment inclure:
+### Indexation - Construction de l’index vectoriel **FAISS**
+Objectif: Créer un index vectoriel **FAISS** à partir des embeddings générés précédemment, afin de permettre la recherche sémantique dans le chatbot.
 
-* la gestion des valeurs manquantes
-* le filtrage des événements hors du périmètre fonctionnel si nécessaire
-* la préparation des documents avant leur vectorisation.
+- Charge les embeddings vectorisés: `data/embeddings.pkl`
 
-Ce corpus constituera ensuite la base documentaire interrogée par le système RAG lors des recherches effectuées par le chatbot.
+- Convertit les embeddings en tableau NumPy float32 (format requis par FAISS)
+
+- Initialise un index FAISS (IndexFlatL2) basé sur la distance euclidienne
+
+- Ajoute tous les vecteurs dans l’index
+
+- Sauvegarde l’index sur disque (`faiss.idx`)
+
+- Sauvegarde les métadonnées associées à chaque vecteur (`metadata.pkl`): uid, titre, ville, dates, lien, chunk de texte, statut actif
+
+Ces métadonnées permettent de reconstruire la réponse du chatbot après une recherche FAISS.

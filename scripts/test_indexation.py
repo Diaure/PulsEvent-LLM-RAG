@@ -4,6 +4,7 @@ import faiss
 from mistralai import Mistral
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 
 # Chargement des clés
 load_dotenv()
@@ -39,23 +40,39 @@ def search(query: str, k=5):
     q_emb = embed_query(query).reshape(1, -1)
 
     # Recherche FAISS
-    distances, indices = index.search(q_emb, k)
+    # distances, indices = index.search(q_emb, k)
+    distances, indices = index.search(q_emb, 50)
+    results = []
 
-    print("\nRésultats :")
     for rank, idx in enumerate(indices[0]):
         event = metadata[idx]
-        print(f"\n--- Résultat {rank+1} ---")
+
+        # Ne garder que les événements actifs
+        if not event["est_actif"]:
+            continue
+
+        results.append((event, distances[0][rank]))
+
+        # On s'arrête quand on a 5 résultats
+        if len(results) == 5:
+            break
+    
+    print("\nRésultats :")
+    for i, (event, distance) in enumerate(results):
+        print(f"\n--- Résultat {i+1} ---")
         print(f"Titre : {event['title']}")
         print(f"Ville : {event['city']}")
         print(f"Date : {event['date']}")
+        print(f"Actif : {event['est_actif']}")
         print(f"URL : {event['canonicalurl']}")
         print(f"Chunk : {event['chunk'][:200]}...")
-        print(f"Distance : {distances[0][rank]:.4f}")
+        print(f"Distance : {distance:.4f}")
 
 # Tests adaptés au Grand Est
 if __name__ == "__main__":
     search("concert à Strasbourg")
-    search("atelier pour enfants à Reims")
-    search("événement gastronomique Alsace")
-    search("festival de musique Metz")
-    search("exposition art contemporain Mulhouse")
+    search("atelier enfants à Reims")
+    search("événement Alsace")
+    search("festival Metz")
+    search("exposition Mulhouse")
+    search("évènements ce week-end à Strasbourg")

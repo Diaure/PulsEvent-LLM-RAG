@@ -28,6 +28,8 @@ for idx, row in ge_events_df.iterrows():
             "title": row["title_fr"],
             "city": row["location_city"],
             "date": row["daterange_fr"],
+            "lastdate_end": row["lastdate_end"],
+            "est_actif": row["event_actif"],
             "canonicalurl": row["canonicalurl"],
             "chunk": chunk})
 

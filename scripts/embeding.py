@@ -52,6 +52,8 @@ for i in tqdm.tqdm(range(0, len(chunks), BATCH_SIZE), desc="Vectorisation Mistra
             "title": c["title"],
             "city": c["city"],
             "date": c["date"],
+            "lastdate_end": c["lastdate_end"],
+            "est_actif": c["est_actif"],
             "canonicalurl": c["canonicalurl"],
             "chunk": c["chunk"],
             "embedding": emb})
