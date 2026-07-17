@@ -119,7 +119,7 @@ tenacity==8.5.0
 threadpoolctl==3.6.0
 tiktoken==0.13.0
 tokenizers==0.22.2
-torch==2.12.1
+torch==2.13.0
 tornado @ file:///D:/bld/tornado_1781006762358/work
 tqdm==4.68.3
 traitlets @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_traitlets_1780507822/work
