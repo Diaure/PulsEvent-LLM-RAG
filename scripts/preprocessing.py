@@ -118,15 +118,15 @@ for e in ge_events_data_filtre:
     nvel_element = {c: e.get(c) for c in champs_a_garder} 
 
     # Statut de l'évènement
-    last_date = e.get("lastdate_end")
-    if last_date:
-        try:
-            date_fin = datetime.fromisoformat(last_date)
-            nvel_element["event_actif"] = date_fin >= today
-        except Exception:
-            nvel_element["event_actif"] = False
-    else:
-        nvel_element["event_actif"] = False
+    # last_date = e.get("lastdate_end")
+    # if last_date:
+    #     try:
+    #         date_fin = datetime.fromisoformat(last_date)
+    #         nvel_element["event_actif"] = date_fin >= today
+    #     except Exception:
+    #         nvel_element["event_actif"] = False
+    # else:
+    #     nvel_element["event_actif"] = False
 
     ge_event_rag.append(nvel_element) 
 
@@ -157,8 +157,8 @@ def contruire_texte_rag(row):
         f"Date: {row['daterange_fr']}",
         f"Début: {row['firstdate_begin']}",
         f"Fin: {row['lastdate_end']}",
-        f"Lien: {row['canonicalurl']}",
-        f"Event_en_cours: {row['event_actif']}"
+        f"Lien: {row['canonicalurl']}"
+        # f"Event_en_cours: {row['event_actif']}"
     ]
     return "\n".join([p for p in parts if p])
 ge_events_df["texte_rag"] = ge_events_df.apply(contruire_texte_rag, axis=1)
@@ -167,7 +167,7 @@ print(ge_events_df.columns)
 print(ge_events_df["texte_rag"].iloc[0])
 print(ge_events_df["registration"].iloc[6])
 print(ge_events_df.head(15))
-print(ge_events_df["event_actif"].value_counts())
+# print(ge_events_df["event_actif"].value_counts())
 
 ge_events_df.to_csv("data/ge_events_df.csv")
 

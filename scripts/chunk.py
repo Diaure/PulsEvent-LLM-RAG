@@ -27,9 +27,12 @@ for idx, row in ge_events_df.iterrows():
             "uid": row["uid"],
             "title": row["title_fr"],
             "city": row["location_city"],
+            "lieu": row["location_name"],
             "date": row["daterange_fr"],
             "lastdate_end": row["lastdate_end"],
-            "est_actif": row["event_actif"],
+            "conditions": row["conditions_fr"],
+            "age_minimum": row["age_min"],
+            "age_maximum": row["age_max"],
             "canonicalurl": row["canonicalurl"],
             "chunk": chunk})
 

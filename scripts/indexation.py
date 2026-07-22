@@ -29,9 +29,12 @@ metadata = [
     {"uid": e["uid"],
         "title": e["title"],
         "city": e["city"],
+        "lieu": e["lieu"],
         "date": e["date"],
         "lastdate_end": e["lastdate_end"],
-        "est_actif": e["est_actif"],
+        "conditions": e["conditions"],
+        "age_minimum": e["age_minimum"],
+        "age_maximum": e["age_maximum"],
         "canonicalurl": e["canonicalurl"],
         "chunk": e["chunk"]}
     for e in data]
