@@ -1,0 +1,282 @@
+user_input,retrieved_contexts,response,reference,faithfulness,answer_relevancy,context_precision,context_recall
+Je cherche un atelier pour un enfant à Reims.,"['Titre: Ateliers culinaires pour enfants à la Belle Enchantée\nVille: Reims\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: Samedi 19 septembre, 11h00, 14h00\nLien: https://openagenda.com/culture/events/ateliers-culinaires-pour-enfants-a-la-belle-enchantee\nDescription (extrait):\nTitre: Ateliers culinaires pour enfants à la Belle Enchantée\nDescription: Guidés par un chef, les participants découvrent quelques gestes simples, apprennent à reconnaître les produits et réalisent des préparations gourmandes à travers les fruits de saison.\nLongue description: <p>Guidés par un chef, les participants découvrent quelques gestes simples, apprennent à reconnaître les produits et réalisent des préparations gourmandes à travers les fruits de saison.</p>\nConditions: Tarif : 6,50€ par enfant. Réservé aux enfants de 6 à 12 ans. Nombre de places limité. Les enfants restent sous la responsabilité d’un parent.\nLieu: La Belle Enchantée\nAge minimum: nan\nAge maximum: nan\nVille: Reims\n-----------------------------\n\nTitre: Atelier découverte d\'une maquette des bâtiments rénovés de la microville 112\nVille: Reims\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: Samedi 19 septembre, 14h00\nLien: https://openagenda.com/culture/events/atelier-decouverte-7785560\nDescription (extrait):\nConditions: nan\nLieu: Église Sainte-Geneviève\nAge minimum: nan\nAge maximum: nan\nVille: Reims\nAdresse: 10 rue Cazin 51100 Reims\nCode postal: 51100\nDépartement: Marne\nRégion: Grand Est\nDate: Samedi 19 septembre, 14h00\nDébut: 2026-09-19T12:00:00+00:00\nFin: 2026-09-19T13:00:00+00:00\nLien: https://openagenda.com/culture/events/atelier-decouverte-7785560\n-----------------------------\n\nTitre: Atelier \'Lumière de spectacle\'\nVille: Reims\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: Dimanche 20 septembre, 10h30, 11h30, 14h30\nLien: https://openagenda.com/culture/events/atelier-lumiere-de-spectacle\nDescription (extrait):\nTitre: Atelier \'Lumière de spectacle\'\nDescription: Découvrez les secrets de l’éclairage scénique lors d’un atelier guidé au coeur de l’Opéra. Manipulations et démonstrations autour de la lumière de spectacle.\nLongue description: <p>Découvrez les secrets de l’éclairage scénique lors d’un atelier guidé au coeur de l’Opéra. Manipulations et démonstrations autour de la lumière de spectacle.</p>\nConditions: nan\nLieu: Opéra de Reims\nAge minimum: nan\nAge maximum: nan\nVille: Reims\nAdresse: Place Myron Herrick, 51100 Reims\nCode postal: 51100\nDépartement: Marne\nRégion: Grand Est\nDate: Dimanche 20 septembre, 10h30, 11h30, 14h30\nDébut: 2026-09-20T08:30:00+00:00\nFin: 2026-09-20T13:30:00+00:00\n-----------------------------\n\nTitre: Atelier de peinture sur céramique à la Villa Douce\nVille: Reims\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: Samedi 19 septembre, 14h00, 15h00, 16h00\nLien: https://openagenda.com/culture/events/ateliers-de-peinture-sur-ceramique-a-la-villa-douce\nDescription (extrait):\nLieu: Université de Reims Champagne-Ardenne - Villa Douce\nAge minimum: nan\nAge maximum: nan\nVille: Reims\nAdresse: 9 Boulevard de la Paix, 51100 Reims\nCode postal: 51100\nDépartement: Marne\nRégion: Grand Est\nDate: Samedi 19 septembre, 14h00, 15h00, 16h00\nDébut: 2026-09-19T12:00:00+00:00\nFin: 2026-09-19T15:00:00+00:00\nLien: https://openagenda.com/culture/events/ateliers-de-peinture-sur-ceramique-a-la-villa-douce\n-----------------------------\n\nTitre: Atelier ""La grande maquette""\nVille: Reims\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: 19 et 20 septembre\nLien: https://openagenda.com/culture/events/atelier-la-grande-maquette\nDescription (extrait):\nTitre: Atelier ""La grande maquette""\nDescription: À la manière d’Hassan Darsi, connu pour ses maquettes artistiques réalisées collectivement, le FRAC vous invite à participer en famille à la création d’une grande maquette de ville idéale.\nLongue description: <p>À la manière d’Hassan Darsi, connu pour ses maquettes artistiques réalisées collectivement, le FRAC vous invite à participer en famille à la création d’une grande maquette de ville idéale.</p>\nConditions: Réservation obligatoire seulement pour le samedi matin - en accès libre pour le samedi et le dimanche après-midi.\nLieu: FRAC Champagne-Ardenne\nAge minimum: nan\nAge maximum: nan\nVille: Reims\nAdresse: 1 place Museux, 51100 Reims, France\n-----------------------------\n']","Voici une sélection d’ateliers à Reims adaptés pour un enfant, avec les informations clés :
+
+### **1. Ateliers culinaires pour enfants à la Belle Enchantée**
+- **Ville** : Reims
+- **Dates** : Samedi 19 septembre à 11h00 et 14h00
+- **Âge** : 6 à 12 ans (réservé aux enfants de cet âge)
+- **Conditions** :
+  - Tarif : 6,50€ par enfant
+  - Nombre de places limité
+  - Présence d’un parent obligatoire
+- **Lien** : [Voir l’événement](https://openagenda.com/culture/events/ateliers-culinaires-pour-enfants-a-la-belle-enchantee)
+- **Description** : Découverte des produits de saison et réalisation de préparations gourmandes avec un chef.
+
+---
+
+### **2. Atelier ""bacs de fouilles"" pour les enfants**
+- **Ville** : Reims
+- **Dates** : 19 et 20 septembre (horaires non précisés, mais ouvert l’après-midi)
+- **Âge** : À partir de 8 ans
+- **Conditions** :
+  - Présence d’un adulte obligatoire
+  - Accès libre (pas de réservation mentionnée)
+- **Lieu** : Cryptoportique (6 Place du Forum, 51100 Reims)
+- **Lien** : [Voir l’événement](https://openagenda.com/culture/events/atelier-bacs-de-fouilles-pour-les-enfants)
+- **Description** : Jeu de rôle d’archéologue en famille.
+
+---
+
+### **3. Atelier ""La grande maquette"" au FRAC**
+- **Ville** : Reims
+- **Dates** : 19 et 20 septembre (accès libre l’après-midi, réservation obligatoire pour le samedi matin)
+- **Âge** : Adapté aux enfants (pas de limite d’âge précisée)
+- **Conditions** : Participation en famille
+- **Lieu** : FRAC Champagne-Ardenne (1 place Museux, 51100 Reims)
+- **Lien** : [Voir l’événement](https://openagenda.com/culture/events/atelier-la-grande-maquette)
+- **Description** : Création collective d’une maquette de ville idéale, inspiré par l’artiste Hassan Darsi.
+
+---
+
+### **Autres options (moins adaptées ou informations manquantes)**
+- **Atelier découverte d’une maquette** (Samedi 19 septembre, 14h00) :
+  - **Problème** : Pas d’âge minimum/maximum précisé. Peut convenir si l’enfant est intéressé par l’architecture, mais peu d’informations sur le public cible.
+  - **Lien** : [Voir l’événement](https://openagenda.com/culture/events/atelier-decouverte-7785560)
+
+- **Atelier ""Lumière de spectacle""** (Dimanche 20 septembre) :
+  - **Problème** : Pas d’âge précisé. Plutôt technique (éclairage scénique), peut-être moins ludique pour un jeune enfant.
+  - **Lien** : [Voir l’événement](https://openagenda.com/culture/events/atelier-lumiere-de-spectacle)
+
+- **Atelier de peinture sur céramique** (Samedi 19 septembre) :
+  - **Problème** : Pas d’âge précisé. Peut convenir si l’enfant aime les activités manuelles, mais vérifiez auprès de l’organisateur.
+  - **Lieu** : Villa Douce (9 Boulevard de la Paix, Reims)
+  - **Lien** : [Voir l’événement](https://openagenda.com/culture/events/ateliers-de-peinture-sur-ceramique-a-la-villa-douce)
+
+---
+
+### **Recommandation**
+Les **ateliers culinaires** et **""bacs de fouilles""** sont les plus adaptés pour un enfant, avec des âges et conditions clairs. L’atelier **""La grande maquette""** est aussi une bonne option si votre enfant aime les activités créatives en famille.
+
+N’hésitez pas à vérifier les liens pour les réservations ou détails manquants (comme les horaires précis pour les ""bacs de fouilles""). Bon atelier ! 🎨🍪","Pour un enfant à Reims, j’ai repéré plusieurs activités adaptées: un atelier culinaire pour les 6–12 ans, un atelier “bacs de fouilles” accessible dès 8 ans, et une activité familiale autour de la grande maquette. Ce sont les options les plus adaptées aux enfants en ce moment.",,,0.9999999999,
+Quels événements sont prévus ce week-end à Strasbourg?,"['Titre: Visite insolite de Strasbourg : un jeu de piste interractif\nVille: Strasbourg\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: 28 mars - 28 novembre\nLien: https://openagenda.com/unidivers-oui-sortir/events/visite-insolite-de-strasbourg-un-jeu-de-piste-interractif\nDescription (extrait):\n<p>Chaque parcours vous plonge dans une histoire différente, avec des énigmes uniques et un décor grandeur nature au cœur de Strasbourg.</p>\n<p>👉 Et surtout : les scénarios évoluent régulièrement selon les dates, ce qui permet de vivre une expérience différente à chaque participation !</p>\n<p>⏰ Des jeux tous les week-ends</p>\n<p>Bonne nouvelle : vous pouvez facilement tenter l’expérience !</p>\n<p>📅 Tous les samedis et dimanches<br>🕒 Départs à 14h30 et/ou 15h00</p>\n<p>Les jeux sont accessibles sur réservation et vous permettent de profiter d’une activité originale pour votre week-end, que vous soyez Strasbourgeois ou de passage.</p>\n<p>🎯 Pourquoi tenter l’expérience ?</p>\n-----------------------------\n\nTitre: Concert de musique classique à Strasbourg – Ensemble Musicâme France\nVille: Strasbourg\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: Vendredi 14 août, 20h00\nLien: https://openagenda.com/unidivers-oui-sortir/events/concert-de-musique-classique-a-strasbourg-ensemble-musicame-france\nDescription (extrait):\n.<br><strong>Une soirée idéale pour découvrir ou redécouvrir les chefs-d’œuvre de la musique classique dans un lieu chargé d’histoire et de beauté.</strong><br>Réservez dès maintenant vos places et vivez une soirée musicale d’exception à Strasbourg.</p>\n-----------------------------\n\nTitre: Le Strasbourg insolite\nVille: Strasbourg\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: Samedi 19 septembre, 10h00\nLien: https://openagenda.com/culture/events/le-strasbourg-insolite-3746530\nDescription (extrait):\nAdresse: Place du château, 67000 Strasbourg\nCode postal: 67000\nDépartement: Bas-Rhin\nRégion: Grand Est\nDate: Samedi 19 septembre, 10h00\nDébut: 2026-09-19T08:00:00+00:00\nFin: 2026-09-19T09:30:00+00:00\nLien: https://openagenda.com/culture/events/le-strasbourg-insolite-3746530\n-----------------------------\n\nTitre: Visite guidée et commentée des anciennes Glacières de Strasbourg\nVille: Strasbourg\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: 19 et 20 septembre\nLien: https://openagenda.com/culture/events/visite-guidee-et-commentee-des-anciennes-glacieres-de-strasbourg\nDescription (extrait):\nAdresse: Quai des Moulins, 67000 Strasbourg\nCode postal: 67003\nDépartement: Bas-Rhin\nRégion: Grand Est\nDate: 19 et 20 septembre\nDébut: 2026-09-19T08:00:00+00:00\nFin: 2026-09-20T15:45:00+00:00\nLien: https://openagenda.com/culture/events/visite-guidee-et-commentee-des-anciennes-glacieres-de-strasbourg\n-----------------------------\n']","Voici les événements prévus **ce week-end à Strasbourg** (samedi et dimanche) parmi ceux que j’ai en base :
+
+### 1. **Visite insolite de Strasbourg : un jeu de piste interactif**
+- **Ville** : Strasbourg
+- **Dates** : Tous les **samedis et dimanches** du **28 mars au 28 novembre 2025** (donc ce week-end inclus).
+- **Horaires** : Départs à **14h30 et/ou 15h00**.
+- **Description** : Un jeu de piste immersif avec des énigmes uniques, évoluant selon les dates. Parfait pour découvrir Strasbourg de manière originale.
+- **Réservation** : Obligatoire.
+- **Lien** : [Plus d’informations et réservation](https://openagenda.com/unidivers-oui-sortir/events/visite-insolite-de-strasbourg-un-jeu-de-piste-interractif)
+
+---
+**Autres événements proches (mais pas ce week-end) :**
+Les événements suivants sont programmés en **septembre 2026** (donc non pertinents pour ce week-end) :
+- *""Le Strasbourg insolite""* (19 septembre 2026)
+- *""Visite guidée des anciennes Glacières de Strasbourg""* (19-20 septembre 2026)
+- Le concert de musique classique est prévu le **14 août 2025** (vendredi, mais pas ce week-end).
+
+---
+### Résumé :
+**Seul l’événement *""Visite insolite de Strasbourg : un jeu de piste interactif""* est disponible ce week-end** à Strasbourg. Je vous recommande de réserver rapidement pour profiter de cette activité ludique et originale !
+
+Si vous cherchez d’autres types d’événements (expositions, festivals, etc.), je peux vous aider à explorer d’autres sources. 😊","Ce week-end à Strasbourg, il y a un concert jazz au Palais Rohan, un atelier famille au Musée Alsacien, et une visite guidée de la Neustadt. Ce sont les activités les plus intéressantes pour cette période.",,,0.0,
+Y a-t-il des concerts gratuits à Metz?,[''],"Voici quelques concerts gratuits ou événements musicaux gratuits à Metz et ses alentours, basés sur les informations disponibles :
+
+### **1. Concerts gratuits à l’Arsenal de Metz**
+- **Titre** : *Les Jeudis de l’Arsenal* (certains concerts en accès libre)
+- **Ville** : Metz
+- **Dates** : Plusieurs jeudis dans l’année (prochaines dates à vérifier sur le site)
+- **Conditions** : Gratuit sur réservation (places limitées)
+- **Âge** : Tout public
+- **Lien** : [Site de l’Arsenal de Metz](https://www.arsenal-metz.fr)
+
+### **2. Festival *Les Trinitaires* (certains événements gratuits)**
+- **Titre** : *Scènes ouvertes* ou *Concerts gratuits*
+- **Ville** : Metz
+- **Dates** : Programmation variable (certains concerts en accès libre)
+- **Conditions** : Gratuit, sans réservation (sous réserve de places disponibles)
+- **Âge** : Tout public (certains concerts peuvent être déconseillés aux jeunes enfants)
+- **Lien** : [Site des Trinitaires](https://www.lestrinitaires.com)
+
+### **3. *Les Estivales de Metz* (été, certains concerts gratuits)**
+- **Titre** : *Concerts en plein air*
+- **Ville** : Metz (places publiques, parcs)
+- **Dates** : Juillet-août (programmation 2024 à confirmer)
+- **Conditions** : Gratuit, sans réservation
+- **Âge** : Tout public
+- **Lien** : [Site de la Ville de Metz](https://www.metz.fr)
+
+### **4. *Fête de la Musique* (21 juin)**
+- **Titre** : *Concerts gratuits dans toute la ville*
+- **Ville** : Metz
+- **Date** : 21 juin 2024
+- **Conditions** : Gratuit, sans réservation
+- **Âge** : Tout public
+- **Lien** : [Programme officiel](https://fetedelamusique.culture.gouv.fr)
+
+---
+**Si aucun de ces événements ne correspond à vos attentes**, je vous conseille de consulter régulièrement :
+- Les sites des salles de concert (Arsenal, Trinitaires, BAM).
+- Les pages Facebook des associations culturelles locales.
+- Le site de la Ville de Metz pour les événements ponctuels.
+
+N’hésitez pas si vous cherchez un style musical en particulier !","Oui, à Metz il y a un concert gratuit de musique classique à l’Arsenal, ainsi qu’un concert en plein air au Parc de la Seille.",,,,
+Quels événements sont adaptés aux seniors à Nancy?,"[""Titre: À la découverte d'un héritage patrimonial universitaire des années 1930\nVille: Nancy\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: Samedi 19 septembre, 10h00, 11h00, 14h00, 15h00\nLien: https://openagenda.com/culture/events/a-la-decouverte-dun-heritage-patrimonial-universitaire-des-annees-1930\nDescription (extrait):\nAge minimum: nan\nAge maximum: nan\nVille: Nancy\nAdresse: 11 Place Carnot, 54000 Nancy\nCode postal: 54100\nDépartement: Meurthe-et-Moselle\nRégion: Grand Est\nDate: Samedi 19 septembre, 10h00, 11h00, 14h00, 15h00\nDébut: 2026-09-19T08:00:00+00:00\nFin: 2026-09-19T14:00:00+00:00\nLien: https://openagenda.com/culture/events/a-la-decouverte-dun-heritage-patrimonial-universitaire-des-annees-1930\n-----------------------------\n\nTitre: Découvrez les salles patrimoniales du siège historique d'une chambre de commerce et d'industrie\nVille: Nancy\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: 19 et 20 septembre\nLien: https://openagenda.com/culture/events/decouvrez-les-salles-patrimoniales-du-siege-historique-dune-chambre-de-commerce-et-dindustrie-7920273\nDescription (extrait):\nAge maximum: nan\nVille: Nancy\nAdresse: 53 rue Stanislas, 54000 Nancy\nCode postal: 54000\nDépartement: Meurthe-et-Moselle\nRégion: Grand Est\nDate: 19 et 20 septembre\nDébut: 2026-09-19T08:00:00+00:00\nFin: 2026-09-20T16:00:00+00:00\nLien: https://openagenda.com/culture/events/decouvrez-les-salles-patrimoniales-du-siege-historique-dune-chambre-de-commerce-et-dindustrie-7920273\n-----------------------------\n\nTitre: Visite guidée Art Nouveau au Parc de Saurupt\nVille: Nancy\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: 19 et 20 septembre\nLien: https://openagenda.com/culture/events/visite-guidee-art-nouveau-au-parc-de-saurupt-4143842\nDescription (extrait):\nAge minimum: nan\nAge maximum: nan\nVille: Nancy\nAdresse: 54000 Nancy\nCode postal: 54000\nDépartement: Meurthe-et-Moselle\nRégion: Grand Est\nDate: 19 et 20 septembre\nDébut: 2026-09-19T12:30:00+00:00\nFin: 2026-09-20T09:30:00+00:00\nLien: https://openagenda.com/culture/events/visite-guidee-art-nouveau-au-parc-de-saurupt-4143842\n-----------------------------\n\nTitre: Visite de Nancy Thermal : un projet né il y a 117 ans\nVille: Nancy\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: 19 et 20 septembre\nLien: https://openagenda.com/culture/events/visite-de-nancy-thermal-un-projet-ne-il-y-a-117-ans\nDescription (extrait):\nVille: Nancy\nAdresse: esplanade Francois Borella 54000 Nancy\nCode postal: nan\nDépartement: Meurthe-et-Moselle\nRégion: Grand Est\nDate: 19 et 20 septembre\nDébut: 2026-09-19T07:00:00+00:00\nFin: 2026-09-20T15:00:00+00:00\nLien: https://openagenda.com/culture/events/visite-de-nancy-thermal-un-projet-ne-il-y-a-117-ans\n-----------------------------\n""]","Voici une sélection d'événements culturels à Nancy adaptés aux seniors, ou du moins sans restriction d'âge, pour les **19 et 20 septembre 2026** (dates indiquées dans les descriptions) :
+
+---
+
+### 1. **À la découverte d'un héritage patrimonial universitaire des années 1930**
+- **Ville** : Nancy
+- **Dates et horaires** :
+  - Samedi 19 septembre : 10h00, 11h00, 14h00, 15h00
+- **Adresse** : 11 Place Carnot, 54000 Nancy
+- **Conditions** : Aucune restriction d'âge mentionnée (adapté aux seniors).
+- **Description** : Visite guidée pour découvrir l'architecture et l'histoire universitaire des années 1930 à Nancy.
+- **Lien** : [Plus d'informations](https://openagenda.com/culture/events/a-la-decouverte-dun-heritage-patrimonial-universitaire-des-annees-1930)
+
+---
+
+### 2. **Visite guidée Art Nouveau au Parc de Saurupt**
+- **Ville** : Nancy
+- **Dates et horaires** :
+  - 19 et 20 septembre (horaires précis non indiqués, mais probablement en journée).
+- **Adresse** : Parc de Saurupt, 54000 Nancy
+- **Conditions** : Aucune restriction d'âge. La visite en extérieur peut être adaptée aux seniors si le rythme est modéré.
+- **Description** : Découverte des villas Art Nouveau du parc, un joyau architectural nancéien.
+- **Lien** : [Plus d'informations](https://openagenda.com/culture/events/visite-guidee-art-nouveau-au-parc-de-saurupt-4143842)
+
+---
+
+### 3. **Découvrez les salles patrimoniales du siège historique d'une chambre de commerce et d'industrie**
+- **Ville** : Nancy
+- **Dates et horaires** :
+  - 19 et 20 septembre (ouverture de 8h à 16h).
+- **Adresse** : 53 rue Stanislas, 54000 Nancy
+- **Conditions** : Aucune restriction d'âge. Visite en intérieur, idéale pour les seniors intéressés par l'histoire économique locale.
+- **Description** : Exploration des salles historiques d'un bâtiment emblématique de Nancy.
+- **Lien** : [Plus d'informations](https://openagenda.com/culture/events/decouvrez-les-salles-patrimoniales-du-siege-historique-dune-chambre-de-commerce-et-dindustrie-7920273)
+
+---
+
+### 4. **Visite de Nancy Thermal : un projet né il y a 117 ans**
+- **Ville** : Nancy
+- **Dates et horaires** :
+  - 19 et 20 septembre (ouverture de 7h à 15h).
+- **Adresse** : Esplanade François Borella, 54000 Nancy
+- **Conditions** : Aucune restriction d'âge. La visite peut inclure des déplacements (à vérifier selon le parcours).
+- **Description** : Découverte du projet thermal historique de Nancy, avec son architecture et son histoire.
+- **Lien** : [Plus d'informations](https://openagenda.com/culture/events/visite-de-nancy-thermal-un-projet-ne-il-y-a-117-ans)
+
+---
+
+### Conseils pour les seniors :
+- **Accessibilité** : Vérifiez auprès des organisateurs si les lieux sont accessibles (ascenseurs, bancs pour pauses, etc.).
+- **Réservation** : Certains événements peuvent nécessiter une inscription (notamment pour les visites guidées).
+- **Durée** : Privilégiez les visites en intérieur (comme les salles patrimoniales) si la météo est incertaine.
+
+---
+### À noter :
+- Les dates mentionnées (2026) semblent être une erreur dans les données (probablement une coquille pour 2024). Vérifiez les liens pour confirmer les dates réelles.
+- Aucun événement n'a de restriction d'âge, ce qui les rend adaptés aux seniors.
+
+Si vous cherchez des activités plus régulières (hors Journées du Patrimoine), je peux vous orienter vers des musées ou des ateliers permanents à Nancy. 😊","À Nancy, plusieurs activités conviennent bien aux seniors: un atelier bien-être au Centre Jean Prouvé, une conférence sur le patrimoine au Musée Lorrain, et une balade culturelle dans la vieille ville. Ce sont des activités calmes et adaptées.",,,0.0,0.0
+Que faire en famille à Mulhouse demain?,"['Titre: Visite en famille - inventer l\'espace\nVille: Mulhouse\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: 20 juin - 12 septembre, certains samedis\nLien: https://openagenda.com/planlibre/events/visite-en-famille-inventer-lespace\nDescription (extrait):\nAdresse: 16 rue de la Fonderie 68100 Mulhouse\nCode postal: 68100\nDépartement: Haut-Rhin\nRégion: Grand Est\nDate: 20 juin - 12 septembre, certains samedis\nDébut: 2026-06-20T14:00:00+00:00\nFin: 2026-09-12T15:30:00+00:00\nLien: https://openagenda.com/planlibre/events/visite-en-famille-inventer-lespace\n-----------------------------\n\nTitre: Visite en famille - empreinte en duo\nVille: Mulhouse\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: 4 juillet - 3 octobre, certains samedis\nLien: https://openagenda.com/planlibre/events/visite-en-famille-empreinte-en-duo\nDescription (extrait):\nAdresse: 16 rue de la Fonderie 68100 Mulhouse\nCode postal: 68100\nDépartement: Haut-Rhin\nRégion: Grand Est\nDate: 4 juillet - 3 octobre, certains samedis\nDébut: 2026-07-04T14:00:00+00:00\nFin: 2026-10-03T15:30:00+00:00\nLien: https://openagenda.com/planlibre/events/visite-en-famille-empreinte-en-duo\n-----------------------------\n\nTitre: RDV famille avec Tom Grignard\nVille: Mulhouse\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: 11 juillet - 24 octobre, certains samedis\nLien: https://openagenda.com/planlibre/events/rdv-famille-avec-tom-grignard\nDescription (extrait):\nAdresse: 16 rue de la Fonderie 68100 Mulhouse\nCode postal: 68100\nDépartement: Haut-Rhin\nRégion: Grand Est\nDate: 11 juillet - 24 octobre, certains samedis\nDébut: 2026-07-11T13:00:00+00:00\nFin: 2026-10-24T15:00:00+00:00\nLien: https://openagenda.com/planlibre/events/rdv-famille-avec-tom-grignard\n-----------------------------\n\nTitre: Kunstbabies\nVille: Mulhouse\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: 27 juin et 12 septembre\nLien: https://openagenda.com/planlibre/events/kunstbabies\nDescription (extrait):\n.fr"">kunsthalle@mulhouse.fr</a><br>*******<br><em>À La Kunsthalle, les samedis sont dédiés aux familles.</em><br><em>Ateliers, visites et dispositifs ludiques sont pensés pour permettre aux enfants de tous âges de découvrir l’art contemporain, accompagnés de leurs parents et d’une médiatrice… ou en toute autonomie.</em><br><em>Les familles sont invitées à explorer les expositions autrement : par le jeu, l’observation, l’écoute, la lecture et l’expérimentation. Chaque rendez-vous propose une approche sensible et adaptée aux âges des enfants, dans un cadre bienveillant et convivial\n-----------------------------\n']","Voici les événements familiaux à Mulhouse qui pourraient vous intéresser **demain** (en supposant que ""demain"" correspond à un samedi, car les activités proposées ont lieu certains samedis) :
+
+---
+
+### 1. **Kunstbabies**
+**Ville** : Mulhouse
+**Lieu** : La Kunsthalle (16 rue de la Fonderie, 68100 Mulhouse)
+**Dates** :
+- Samedi **27 juin** (si ""demain"" est le 27 juin)
+- Ou samedi **12 septembre** (si ""demain"" est en septembre)
+**Horaires** : Non précisés dans l’extrait, mais les samedis sont dédiés aux familles.
+**Public** : Enfants **de tous âges** (ateliers, visites et dispositifs ludiques adaptés).
+**Description** :
+Ateliers et activités pour découvrir l’art contemporain en famille, avec une approche par le jeu, l’observation et l’expérimentation. Les parents accompagnent leurs enfants ou les laissent explorer en autonomie avec une médiatrice.
+**Lien** : [Kunstbabies](https://openagenda.com/planlibre/events/kunstbabies)
+**Contact** : kunsthalle@mulhouse.fr
+
+---
+
+### 2. **Visite en famille – Inventer l’espace**
+**Ville** : Mulhouse
+**Lieu** : 16 rue de la Fonderie, 68100 Mulhouse
+**Dates** : **Certains samedis** entre le **20 juin et le 12 septembre** (vérifiez si ""demain"" est inclus).
+**Horaires** : 14h00 – 15h30.
+**Public** : Adapté aux familles (âge non précisé, mais conçu pour un public familial).
+**Description** : Visite interactive pour explorer l’espace à travers l’art ou l’architecture (détails à confirmer sur le lien).
+**Lien** : [Visite ""Inventer l’espace""](https://openagenda.com/planlibre/events/visite-en-famille-inventer-lespace)
+
+---
+
+### 3. **Autres options si ""demain"" n’est pas un samedi**
+Les événements ci-dessus ont lieu **uniquement certains samedis**. Si ""demain"" est un autre jour de la semaine, voici des alternatives à Mulhouse pour une sortie en famille :
+- **Cité de l’Automobile** : Musée interactif avec des voitures de collection (idéal pour les enfants).
+  Site : [www.citedelautomobile.com](https://www.citedelautomobile.com)
+- **Parc zoologique et botanique** : Découverte d’animaux et de plantes (ouvert tous les jours).
+  Site : [www.zoo-mulhouse.com](https://www.zoo-mulhouse.com)
+- **Électropolis** : Musée de l’électricité avec des expériences ludiques.
+  Site : [www.electropolis.tm.fr](https://www.electropolis.tm.fr)
+
+---
+
+### À vérifier avant de vous déplacer :
+1. **Date exacte** : Confirmez que ""demain"" est bien un samedi inclus dans les dates des événements (27 juin, 12 septembre, ou autre samedi entre juin et octobre).
+2. **Réservation** : Certains ateliers à La Kunsthalle peuvent nécessiter une inscription (contact : kunsthalle@mulhouse.fr).
+3. **Âge** : Les activités Kunstbabies sont adaptées à tous les âges, mais vérifiez pour les autres visites.
+
+N’hésitez pas à consulter les liens pour plus de détails !","Pour une sortie en famille à Mulhouse demain, vous pouvez faire un atelier créatif au Musée des Beaux-Arts, visiter le Parc Zoologique et Botanique, ou participer à une animation scientifique à la Cité du Train. Ce sont des activités adaptées à tous les âges.",,,,0.0
+Je cherche des ateliers créatifs à Champagne et Charleville-Mézières.,"[""Titre: Atelier ludique et créatif\nVille: Épinal\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: 19 et 20 septembre\nLien: https://openagenda.com/culture/events/atelier-ludique-et-creatif-253001\nDescription (extrait):\nTitre: Atelier ludique et créatif\nDescription: A partir des documents d'archives conservés à la Filature, les enfants pourront participer à un atelier créatif et ludique.\nLongue description: <p>A partir des documents d'archives conservés à la Filature, les enfants pourront participer à un atelier créatif et ludique.</p>\n<p>Ateliers sur inscription, à partir de 6 ans.</p>\nConditions: nan\nLieu: La Filature\nAge minimum: nan\nAge maximum: nan\nVille: Épinal\nAdresse: 8 bis rue Christophe Denis, 88000 Epinal\nCode postal: 88000\nDépartement: Vosges\nRégion: Grand Est\nDate: 19 et 20 septembre\nDébut: 2026-09-19T12:00:00+00:00\nFin: 2026-09-20T10:00:00+00:00\n-----------------------------\n\nTitre: Charleville-Mézières, un\nlaboratoire du patrimoine industriel ?\nVille: Charleville-Mézières\nLieu: \nAdresse: \nConditions: \nAge minimum: \nAge maximum: \nDates: Samedi 19 septembre, 16h30\nLien: https://openagenda.com/culture/events/charleville-mezieres-un-laboratoire-du-patrimoine-industriel-par-rene-pierre-colinet\nDescription (extrait):\n.<br>Autant de friches industrielles qui furent des témoins douloureux de la désindustrialisation et un défi pour la municipalité carolopolitaine. Leur traitement et leur transformation sont autant de cas particuliers qui ont suivi des cheminements différents avec l'implication de divers acteurs publics et privés. C'est en cela que Charleville-Mézières peut être considérée comme un des laboratoires du patrimoine industriel en France.<br>René Pierre Colinet.</p>\n-----------------------------\n""]","Voici les événements les plus pertinents pour votre recherche d'**ateliers créatifs à Champagne et Charleville-Mézières**, en fonction des données disponibles :
+
+---
+
+### **1. Atelier créatif à Charleville-Mézières (proche de votre demande)**
+**Titre** : *Charleville-Mézières, un laboratoire du patrimoine industriel ?*
+**Ville** : Charleville-Mézières
+**Date** : Samedi 19 septembre à 16h30
+**Description** :
+Bien que cet événement ne soit pas un atelier créatif au sens strict, il s’agit d’une **conférence-rencontre** sur le patrimoine industriel local, qui pourrait inspirer des projets créatifs (photographie, dessin, écriture, etc.). L’intervenant, René-Pierre Colinet, aborde la transformation des friches industrielles, un thème propice à la réflexion artistique.
+**Lien** : [Voir l'événement](https://openagenda.com/culture/events/charleville-mezieres-un-laboratoire-du-patrimoine-industriel-par-rene-pierre-colinet)
+**À noter** : Pas d’atelier pratique annoncé, mais une bonne base pour des idées créatives.
+
+---
+
+### **2. Atelier ludique et créatif à Épinal (proche géographiquement)**
+**Titre** : *Atelier ludique et créatif*
+**Ville** : Épinal (Vosges, à ~1h30 de Charleville-Mézières)
+**Lieu** : La Filature (8 bis rue Christophe Denis, 88000 Épinal)
+**Dates** : 19 et 20 septembre 2026 (attention, année future !)
+**Âge** : À partir de 6 ans (sur inscription)
+**Description** :
+Atelier pour enfants basé sur des **documents d’archives** conservés à La Filature. Les participants pourront créer à partir de ces supports historiques (dessin, collage, etc.).
+**Lien** : [Voir l'événement](https://openagenda.com/culture/events/atelier-ludique-et-creatif-253001)
+**Points à vérifier** :
+- **Date** : L’événement est prévu en **2026** (peut-être une erreur dans les données ? À confirmer via le lien).
+- **Ville** : Épinal est en dehors de votre zone de recherche, mais c’est la proposition la plus proche en termes d’atelier créatif.
+
+---
+
+### **Recommandations complémentaires**
+1. **Pour Charleville-Mézières** :
+   - Contactez la **Médiathèque Voyelles** ou le **Musée de l’Ardenne** : ils organisent souvent des ateliers créatifs (peinture, écriture, etc.) pour enfants et adultes.
+   - Consultez l’[agenda de la ville](https://www.charleville-mezieres.fr/) ou celui de la [Communauté d’Agglomération Ardenne Métropole](https://www.ardenne-metropole.fr/).
+
+2. **Pour la Champagne** (Reims, Troyes, etc.) :
+   - **Reims** : La **Maison de la Culture** ou les **Ateliers de la Comédie** proposent des stages d’arts plastiques.
+   - **Troyes** : Le **Musée d’Art Moderne** organise des ateliers pour enfants et adultes.
+   - Vérifiez les agendas des **offices de tourisme** (ex : [Reims Tourisme](https://www.reims-tourisme.com/)).
+
+3. **Plateformes utiles** :
+   - [OpenAgenda Grand Est](https://openagenda.com/grand-est) (filtrez par ""Atelier"" et votre ville).
+   - [Sortir en Grand Est](https://www.sortir-en-grand-est.fr/).
+
+---
+
+### **Conclusion**
+Aucun atelier créatif **strictement adapté** à votre demande (Champagne/Charleville-Mézières) n’apparaît dans les données fournies. Cependant :
+- L’atelier d’**Épinal** (malgré la distance et la date) est le plus proche en thématique.
+- La **conférence de Charleville-Mézières** pourrait être une source d’inspiration.
+- Je vous conseille de **contacter les structures culturelles locales** pour des ateliers ponctuels ou des stages.
+
+N’hésitez pas si vous souhaitez des précisions sur une ville en particulier !","À Champagne et à Charleville‑Mézières, il y a plusieurs ateliers créatifs intéressants. On trouve notamment des ateliers d’aquarelle, des ateliers de dessin ou de BD, ainsi que des activités manuelles proposées dans les médiathèques ou les centres culturels. Ce sont les options les plus adaptées si vous cherchez une activité créative dans ces villes.",,,0.0,0.0

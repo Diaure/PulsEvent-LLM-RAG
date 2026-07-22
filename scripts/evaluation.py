@@ -1,65 +1,102 @@
-import numpy as np
-from mistralai import Mistral
-from dotenv import load_dotenv
 import os
+import pandas as pd
+from datasets import Dataset
+from dotenv import load_dotenv
 
-from chatbot_rag import generate_answer  # ton chatbot
+from ragas import evaluate
+from ragas.metrics import (
+    faithfulness,
+    answer_relevancy,
+    context_precision,
+    context_recall,)
+
+from langchain_mistralai.chat_models import ChatMistralAI
+from langchain_mistralai.embeddings import MistralAIEmbeddings
+import time
+
+# Import de mon chatbot
+from chatbot_rag import generate_answer, recherche_event_pertinent, build_context
 
 load_dotenv()
 api_key = os.getenv("PULSEVENT_MISTRAL_KEY")
 
-embed_client = Mistral(api_key=api_key)
-model_embed = "mistral-embed"
+# Liste de questions
+questions = [
+    "Je cherche un atelier pour un enfant à Reims.",
+    "Quels événements sont prévus ce week-end à Strasbourg?",
+    "Y a-t-il des concerts gratuits à Metz?",
+    "Quels événements sont adaptés aux seniors à Nancy?",
+    "Que faire en famille à Mulhouse demain?",
+    "Je cherche des ateliers créatifs à Champagne et Charleville-Mézières."]
 
-# Fonction pour embedder un texte
-def embed_text(text):
-    response = embed_client.embeddings.create(
-        model=model_embed,
-        inputs=[text]
-    )
-    return np.array(response.data[0].embedding, dtype="float32")
+# Liste des réponses idéales
+ground_truths = [
+    "Pour un enfant à Reims, j’ai repéré plusieurs activités adaptées: un atelier culinaire pour les 6–12 ans, un atelier “bacs de fouilles” accessible dès 8 ans, et une activité familiale autour de la grande maquette. Ce sont les options les plus adaptées aux enfants en ce moment.",
+    "Ce week-end à Strasbourg, il y a un concert jazz au Palais Rohan, un atelier famille au Musée Alsacien, et une visite guidée de la Neustadt. Ce sont les activités les plus intéressantes pour cette période.",
+    "Oui, à Metz il y a un concert gratuit de musique classique à l’Arsenal, ainsi qu’un concert en plein air au Parc de la Seille.",
+    "À Nancy, plusieurs activités conviennent bien aux seniors: un atelier bien-être au Centre Jean Prouvé, une conférence sur le patrimoine au Musée Lorrain, et une balade culturelle dans la vieille ville. Ce sont des activités calmes et adaptées.",
+    "Pour une sortie en famille à Mulhouse demain, vous pouvez faire un atelier créatif au Musée des Beaux-Arts, visiter le Parc Zoologique et Botanique, ou participer à une animation scientifique à la Cité du Train. Ce sont des activités adaptées à tous les âges.",
+    "À Champagne et à Charleville‑Mézières, il y a plusieurs ateliers créatifs intéressants. On trouve notamment des ateliers d’aquarelle, des ateliers de dessin ou de BD, ainsi que des activités manuelles proposées dans les médiathèques ou les centres culturels. Ce sont les options les plus adaptées si vous cherchez une activité créative dans ces villes.",
 
-# Similarité cosinus
-def cosine_similarity(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
-
-# Classification automatique
-def classify(similarity):
-    if similarity >= 0.85:
-        return "correcte"
-    elif similarity >= 0.65:
-        return "partiellement correcte"
-    else:
-        return "incorrecte"
-
-# Jeu de tests
-tests = [
-    {
-        "question": "Je cherche un atelier pour un enfant à Reims.",
-        "expected": "Réponse humaine annotée ici..."
-    },
-    {
-        "question": "Quels événements sont prévus ce week-end à Strasbourg ?",
-        "expected": "Réponse humaine annotée ici..."
-    }
 ]
 
-# Évaluation
-for test in tests:
-    print("\n==============================")
-    print("Question :", test["question"])
+# générer les réponses IA et les contextes
+reponses = []
+contextes = []
 
-    ia_answer = generate_answer(test["question"])
-    expected = test["expected"]
+for q in questions:
+    time.sleep(1.5) # delai entre les appels Mistral pour éviter d'atteindre la limte d'appel Mistral
+    ia_answer = generate_answer(q)
+    reponses.append(ia_answer)
 
-    print("\nRéponse IA :\n", ia_answer)
-    print("\nRéponse humaine :\n", expected)
+    retrieved = recherche_event_pertinent(q)
+    ctx = build_context(retrieved)
+    contextes.append([ctx]) # pour chaque question, ragas attend une liste de string pour le contexte
 
-    emb_ia = embed_text(ia_answer)
-    emb_expected = embed_text(expected)
+# construire le dataset complet pour RAGAS
+evaluation_data = {
+    "question": questions,
+    "answer": reponses,
+    "contexts": contextes,
+    "ground_truth": ground_truths}
 
-    sim = cosine_similarity(emb_ia, emb_expected)
-    label = classify(sim)
+evaluation_df = Dataset.from_dict(evaluation_data)
+print("Dataset d'évaluation prêt.")
 
-    print("\nSimilarité :", round(sim, 3))
-    print("Évaluation :", label)
+# Configuration LLM & Embeddings
+mistral_llm = ChatMistralAI(mistral_api_key = api_key, model = "mistral-large-latest", temperature=0.1)
+mistral_embeddings = MistralAIEmbeddings(mistral_api_key= api_key, model = "mistral-embed")
+
+# Définition des métriques à calculer
+metrics_to_evaluate = [
+        faithfulness,       # Génération: fidèle au contexte ?
+        answer_relevancy,   # Génération: réponse pertinente à la question ?
+        context_precision,  # Récupération: contexte précis (peu de bruit) ?
+        context_recall,]     # Récupération: infos clés récupérées (nécessite ground_truth) ?
+print(f"Métriques sélectionnées: {[m.name for m in metrics_to_evaluate]}")
+
+# Lancement de l'évaluation Ragas
+print("\nLancement de l'évaluation Ragas (peut prendre du temps)...")
+time.sleep(2)
+results = evaluate(
+        dataset = evaluation_df,
+        metrics = metrics_to_evaluate,
+        llm = mistral_llm,                # LLM pour juger certaines métriques
+        embeddings = mistral_embeddings)   # Embeddings pour juger d'autres métriques
+print("\n--- Évaluation Ragas terminée ---")
+
+# Affichage des résultats
+results_df = results.to_pandas()
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', 1000)
+
+print("\n--- Résultats RAGAS ---")
+print(results_df)
+
+print("\n--- Scores moyens ---")
+print(results_df.mean(numeric_only=True))
+
+# Export CSV
+output_path = "data/ragas_results.csv"
+results_df.to_csv(output_path, index=False)
+print(f"\nFichier CSV exporté : {output_path}")

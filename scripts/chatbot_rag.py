@@ -6,7 +6,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from mistralai import Mistral
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_mistralai import ChatMistralAI
+from langchain_mistralai import ChatMistralAI, MistralAIEmbeddings
 
 # Chargement clé API
 load_dotenv()
@@ -26,16 +26,15 @@ embed_client = Mistral(api_key=api_key)
 model_embed = "mistral-embed"
 model_llm = "mistral-large-latest"
 
-# Choix du modèle pour la transformation en représentation numérique
-# embeddings_model = MistralAIEmbeddings(api_key = api_key, model = model_embed)
+# Choix du modèle pour la transformation en représentation numérique (compatible avec RAGAS)
+embeddings_model = MistralAIEmbeddings(api_key = api_key, model = model_embed)
 
 # Modèle pour générer la réponse (LLM)
 chatbot_llm = ChatMistralAI(model = model_llm, api_key=api_key)
 
 # Fonction pour l'embedding du prompt de l'utilisateur
-def embed_query(query):
-    response = embed_client.embeddings.create(model = model_embed, inputs=[query])
-    return response.data[0].embedding # les objets sont des listes de floats
+def embed_query(query): # récupère le prompt, transforme en vecteur nupérique (token > passage dans le transformer spécialisé > extraction > normalisation > renvoi du vecteur) 
+    return embeddings_model.embed_query(query) # retourne une liste de floats
 
 # Vérifier si l'évènement est actif
 def est_actif(event):
