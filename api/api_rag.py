@@ -3,10 +3,9 @@ from pydantic import BaseModel
 from scripts.chatbot_rag import PulsEventRAG
 
 app = FastAPI(
-    title="PulsEvent RAG API",
-    description="API REST pour interroger le système RAG PulsEvent",
-    version="1.0"
-)
+    title = "PulsEvent RAG API",
+    description = "API REST pour interroger le système RAG PulsEvent",
+    version = "1.0")
 
 rag = PulsEventRAG()
 

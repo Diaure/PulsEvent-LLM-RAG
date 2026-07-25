@@ -31,18 +31,34 @@ questions = [
 
 # Liste des réponses idéales
 ground_truths = [
-    "Pour un enfant à Reims, j’ai repéré plusieurs activités adaptées: un atelier culinaire pour les 6–12 ans, un atelier “bacs de fouilles” accessible dès 8 ans, et une activité familiale autour de la grande maquette. Ce sont les options les plus adaptées aux enfants en ce moment.",
-    "Ce week-end à Strasbourg, il y a un concert jazz au Palais Rohan, un atelier famille au Musée Alsacien, et une visite guidée de la Neustadt. Ce sont les activités les plus intéressantes pour cette période.",
-    "Oui, à Metz il y a un concert gratuit de musique classique à l’Arsenal, ainsi qu’un concert en plein air au Parc de la Seille.",
-    "À Nancy, plusieurs activités conviennent bien aux seniors: un atelier bien-être au Centre Jean Prouvé, une conférence sur le patrimoine au Musée Lorrain, et une balade culturelle dans la vieille ville. Ce sont des activités calmes et adaptées.",
-    "Pour une sortie en famille à Mulhouse demain, vous pouvez faire un atelier créatif au Musée des Beaux-Arts, visiter le Parc Zoologique et Botanique, ou participer à une animation scientifique à la Cité du Train. Ce sont des activités adaptées à tous les âges.",
-    "À Champagne et à Charleville‑Mézières, il y a plusieurs ateliers créatifs intéressants. On trouve notamment des ateliers d’aquarelle, des ateliers de dessin ou de BD, ainsi que des activités manuelles proposées dans les médiathèques ou les centres culturels. Ce sont les options les plus adaptées si vous cherchez une activité créative dans ces villes.",
-
+    "À Reims, trois ateliers sont adaptés aux enfants cette semaine : un atelier culinaire pour les 6–12 ans, un atelier “bacs de fouilles” accessible dès 8 ans, et un atelier créatif “La grande maquette” au FRAC. Ce sont les activités spécifiquement conçues pour les enfants.",
+    "Ce week-end à Strasbourg, les activités principales sont un concert jazz au Palais Rohan, un atelier famille au Musée Alsacien et une visite guidée de la Neustadt. Ce sont les événements culturels programmés pour cette période.",
+    "À Metz, il y a deux concerts gratuits : un concert de musique classique à l’Arsenal et un concert en plein air au Parc de la Seille. Ce sont les événements gratuits disponibles.",
+    "À Nancy, trois activités conviennent aux seniors : une visite patrimoniale universitaire, une visite Art Nouveau au Parc de Saurupt et une visite des salles patrimoniales de la Chambre de Commerce. Ce sont des activités adaptées à un public senior.",
+    "À Mulhouse, trois activités familiales sont proposées demain : un atelier créatif au Musée des Beaux-Arts, une visite du Parc Zoologique et Botanique et une animation scientifique à la Cité du Train. Ce sont les activités adaptées à tous les âges.",
+    "À Charleville-Mézières et dans la région de Champagne, plusieurs ateliers créatifs sont proposés : aquarelle, dessin, BD et activités manuelles dans les médiathèques. Ce sont les ateliers créatifs disponibles.",
 ]
 
 # générer les réponses IA et les contextes
 reponses = []
 contextes = []
+
+# def split_text(text, chunk_size=300):
+#     words = text.split()
+#     chunks = []
+#     current = []
+
+#     for w in words:
+#         current.append(w)
+#         if len(current) >= chunk_size:
+#             chunks.append(" ".join(current))
+#             current = []
+
+#     if current:
+#         chunks.append(" ".join(current))
+
+#     return chunks
+
 
 for q in questions:
     time.sleep(1.5) # delai entre les appels Mistral pour éviter d'atteindre la limte d'appel Mistral
@@ -50,8 +66,13 @@ for q in questions:
     reponses.append(ia_answer)
 
     retrieved = recherche_event_pertinent(q)
-    ctx = build_context(retrieved)
-    contextes.append([ctx]) # pour chaque question, ragas attend une liste de string pour le contexte
+    chunks = [r["chunk"] for r in retrieved]
+    contextes.append(chunks)
+
+    # ctx = build_context(retrieved)
+    # chunks = split_text(ctx, chunk_size=300)
+    # contextes.append(chunks) # pour chaque question, ragas attend une liste de string pour le contexte
+    print(contextes[0])
 
 # construire le dataset complet pour RAGAS
 evaluation_data = {
