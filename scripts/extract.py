@@ -39,7 +39,9 @@ for debut, fin in periodes:
             "location_region:Grand Est"
         ],
         "where": (
-            f'firstdate_begin >= "{debut}" '
+            # f'firstdate_begin >= "{debut}" '
+            # f'AND firstdate_begin < "{fin}"'
+            f'lastdate_begin >= "{debut}" '
             f'AND firstdate_begin < "{fin}"'
         ),
         "limit": limit,

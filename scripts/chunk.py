@@ -1,6 +1,7 @@
 import pandas as pd
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import pickle
+import json
 
 # Chargment des données
 ge_events_df = pd.read_csv(".\data\ge_events_df.csv")
@@ -8,6 +9,29 @@ print("Nombre d'évènements:", ge_events_df.shape[0])
 
 print(ge_events_df["texte_rag"].str.len().describe())
 print((ge_events_df["texte_rag"].str.len() > 700).sum())
+
+# récupérer les vraies dates de debut et fin de l'évènement
+def extract_first_timing(row):
+    raw = row.get("timings")
+    if raw is None:
+        return None, None
+
+    # Convertir la chaîne JSON en liste Python
+    try:
+        timings = json.loads(raw) if isinstance(raw, str) else raw
+    except Exception:
+        return None, None
+
+    if not timings:
+        return None, None
+
+    # On prend la première occurrence
+    t0 = timings[0]
+    return t0.get("begin"), t0.get("end")
+
+# Création des deux colonnes
+ge_events_df["timing_begin"], ge_events_df["timing_end"] = zip(
+    *ge_events_df.apply(extract_first_timing, axis=1))
 
 
 # Code cours
@@ -29,6 +53,9 @@ for idx, row in ge_events_df.iterrows():
             "city": row["location_city"],
             "lieu": row["location_name"],
             "date": row["daterange_fr"],
+            "timing_begin": row["timing_begin"],
+            "timing_end": row["timing_end"],
+            "firstdate_begin": row["firstdate_begin"],
             "lastdate_end": row["lastdate_end"],
             "conditions": row["conditions_fr"],
             "age_minimum": row["age_min"],

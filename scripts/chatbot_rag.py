@@ -25,29 +25,6 @@ with open("./faiss_index/metadata.pkl", "rb") as f:
 print(index.ntotal)
 print(len(metadata))
 
-for event in metadata[:20]:
-    print(event["title"])
-    print(event["lastdate_end"])
-
-from collections import Counter
-
-annees = []
-
-for event in metadata:
-    if event["lastdate_end"]:
-        annees.append(event["lastdate_end"][:4])
-
-print(Counter(annees))
-
-for event in metadata:
-
-    if event["lastdate_end"]:
-
-        if event["lastdate_end"][:4] == "2043":
-
-            print(event["title"])
-            print(event["lastdate_end"])
-            print(event["canonicalurl"])
 
 # Configuration de la connexion à l'API Mistral
 embed_client = Mistral(api_key=api_key)
@@ -66,11 +43,22 @@ def embed_query(query): # récupère le prompt, transforme en vecteur nupérique
 
 # Vérifier si l'évènement est actif
 def est_actif(event):
-    if event["lastdate_end"] is None:
+    if event["t"] is None:
         return False
 
     date_fin = datetime.fromisoformat(event["lastdate_end"].replace("Z", "+00:00"))
     return date_fin >= datetime.now(date_fin.tzinfo)
+
+# Normaliser
+def normalize_city(value):
+    if isinstance(value, str):
+        return value.strip().lower().split("(")[0].strip()
+    return None
+
+# for e in metadata:
+#     if normalize_city(e.get("city")) == "strasbourg":
+#         print(e["title"], e["firstdate_begin"], e["lastdate_end"], e.get("timing_begin"), e.get("timing_end"))
+
 
 # Détecter automatiquement les villes
 def extraire_ville(question: str):
@@ -79,9 +67,9 @@ def extraire_ville(question: str):
 
     # Extraire toutes les villes valides (uniquement les strings)
     villes_disponibles = {
-        str(e["city"]).lower()
+        normalize_city(e.get("city"))
         for e in metadata
-        if isinstance(e.get("city"), str) and e.get("city").strip() != ""}
+        if normalize_city(e.get("city")) is not None}
 
     # Chercher une ville dans la question
     for ville in villes_disponibles:
@@ -186,33 +174,14 @@ def extraire_intervalle_temporel(question: str):
             pass
     return None
 
+# Filtre temporel
 def event_is_in_interval(event, start, end):
     try:
-        first = datetime.fromisoformat(event["firstdate_begin"].replace("Z", "+00:00"))
-        last = datetime.fromisoformat(event["lastdate_end"].replace("Z", "+00:00"))
-        return (first <= end) and (last >= start)
+        debut = datetime.fromisoformat(event["timing_begin"].replace("Z", "+00:00"))
+        fin = datetime.fromisoformat(event["timing_end"].replace("Z", "+00:00"))
+        return (debut <= end) and (fin >= start)
     except:
         return False
-    # dates = event.get("date")
-
-    # if not dates:
-    #     return False
-
-    # # Si "date" est une liste d'occurrences
-    # if isinstance(dates, list):
-    #     try:
-    #         occurrences = [datetime.fromisoformat(d.replace("Z", "+00:00")) for d in dates]
-    #     except:
-    #         return False
-    # else:
-    #     # Si "date" est une seule occurrence
-    #     try:
-    #         occurrences = [datetime.fromisoformat(dates.replace("Z", "+00:00"))]
-    #     except:
-    #         return False
-
-    # # Vérifier si une occurrence tombe dans l'intervalle
-    # return any(start <= occ <= end for occ in occurrences)
 
 
 # Recherche des évènements pertinents en fonction de l'actualité de l'évènement au moment de l'envoi du prompt
@@ -241,15 +210,20 @@ def recherche_event_pertinent(query, k = 40, max_results = 5):
             continue
 
         # filtre actif
-        if not est_actif(event):
+        try:
+            date_fin = datetime.fromisoformat(event["lastdate_end"].replace("Z", "+00:00"))
+            if date_fin < datetime.now(date_fin.tzinfo):
+                continue
+        except:
             continue
 
         # filtre ville
+        city_event = normalize_city(event.get("city"))
         if ville is not None:
-            if event["city"].lower() != ville:
+            if city_event != ville:
                 continue
 
-        # filtre âge
+        # # filtre âge
         if age_min is not None:
             if event.get("age_minimum", 0) > age_min:
                 continue
@@ -258,18 +232,8 @@ def recherche_event_pertinent(query, k = 40, max_results = 5):
         if intervalle is not None:
             start, end = intervalle
             if not event_is_in_interval(event, start, end):
-            # try:
-            #     date_event = datetime.fromisoformat(event["lastdate_end"].replace("Z", "+00:00"))
-            #     if not (start <= date_event <= end):
                 continue
-            # except:
-            #     pass
-        
-        # filtre mots-clés
-        # texte = (event["title"] + " " + event["chunk"]).lower()
-        # if not any(mot in texte for mot in mots_cles):
-        #     continue
-
+           
         uid_vu.add(event["uid"])
         results.append(event)
 
@@ -295,11 +259,8 @@ Consignes:
 - Il est interdit d'utiliser tes connaissances générales.
 - Il est interdit d'inventer un événement.
 - Tu n'as pas accès à Internet.
-- Mentionne le titre, la ville, les dates, les conditions, l'âge minimum et maximum et le lien quand c'est possible.
 - Si le contexte est vide, réponds exactement: "Je n'ai trouvé aucun événement correspondant à votre recherche dans la base de données."
-- N'utilise jamais tes connaissances personnelles.
-- Ne propose jamais un événement qui n'est pas explicitement présent dans le contexte.
-- Ne fabrique pas d'événements qui ne sont pas dans le contexte.
+- Mentionne le titre, la ville, les dates, les conditions, l'âge minimum et maximum et le lien quand c'est possible.
 
 Réponse :
 """)
@@ -316,6 +277,8 @@ def build_context(results): # contruit un contexte complet qui fournit toutes le
             f"Conditions: {r.get('conditions', '')}\n"
             f"Age minimum: {r.get('age_minimum', '')}\n"
             f"Age maximum: {r.get('age_maximum', '')}\n"
+            f"Debut: {r['timing_begin']}\n"
+            f"Fin: {r['timing_end']}\n"
             f"Dates: {r['date']}\n"
             f"Lien: {r['canonicalurl']}\n"
             f"Description (extrait):\n{r['chunk']}\n"
@@ -330,7 +293,6 @@ def generate_answer(question):
         return "Je n'ai trouvé aucun événement correspondant à votre recherche."
     
     context = build_context(event)
-    print(context)
 
     chain = prompt | chatbot_llm
     response = chain.invoke(
@@ -362,16 +324,12 @@ class PulsEventRAG:
         return "Index reconstruit avec succès."
 
     def ask(self, question: str) -> str:
-        # Pipeline complet EXACTEMENT comme ton chatbot
-        # retrieved = recherche_event_pertinent(question)
-        # context = build_context(retrieved)
-        # answer = generate_answer(question)
         return generate_answer(question)
 
 # Tests
 # print(generate_answer("Je cherche un atelier pour un enfant à Reims."))
-# print(generate_answer("Quels événements sont prévus ce week-end à Strasbourg?"))
+print(generate_answer("Quels événements sont prévus le mois prochain à Strasbourg?"))
 # print(generate_answer("Y a-t-il des concerts gratuits à Metz?"))
 # print(generate_answer("Quels événements sont adaptés aux seniors à Nancy?"))
-# print(generate_answer("Que faire en famille à Mulhouse demain?"))
-print(generate_answer("Je cherche des ateliers créatifs à Champagne et Charleville-Mézières."))
+# print(generate_answer("Que faire en famille à Mulhouse en septembre?"))
+# print(generate_answer("Je cherche des ateliers créatifs à Champagne et Charleville-Mézières."))

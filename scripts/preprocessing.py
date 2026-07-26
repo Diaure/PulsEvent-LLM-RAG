@@ -7,13 +7,6 @@ from datetime import datetime, timezone
 # Lecture de l'extraction
 with open("data/grand_est_events.json", "r", encoding="utf-8") as f:
     ge_events = json.load(f)
-    # print(ge_events)
-
-# liste_categ = []
-# for c in ge_events:
-#     categorie = c.get("category")
-#     liste_categ.append(categorie)
-# print(liste_categ) # None pour tous
 
 # Compter les occurrences keywords
 liste_kw = []
@@ -106,7 +99,7 @@ for to, count in tos_compte.most_common():
 champs_a_garder = [
     "uid", "canonicalurl",
     "title_fr", "description_fr", "longdescription_fr",
-    "conditions_fr",
+    "conditions_fr", "timings",
     "daterange_fr", "firstdate_begin", "lastdate_end",
     "location_name", "location_address", "location_postalcode", "location_city", "location_department", "location_region",
     "age_min", "age_max", "registration"]
@@ -118,15 +111,15 @@ for e in ge_events_data_filtre:
     nvel_element = {c: e.get(c) for c in champs_a_garder} 
 
     # Statut de l'évènement
-    # last_date = e.get("lastdate_end")
-    # if last_date:
-    #     try:
-    #         date_fin = datetime.fromisoformat(last_date)
-    #         nvel_element["event_actif"] = date_fin >= today
-    #     except Exception:
-    #         nvel_element["event_actif"] = False
-    # else:
-    #     nvel_element["event_actif"] = False
+    last_date = e.get("lastdate_end")
+    if last_date:
+        try:
+            date_fin = datetime.fromisoformat(last_date)
+            nvel_element["event_actif"] = date_fin >= today
+        except Exception:
+            nvel_element["event_actif"] = False
+    else:
+        nvel_element["event_actif"] = False
 
     ge_event_rag.append(nvel_element) 
 
@@ -154,9 +147,10 @@ def contruire_texte_rag(row):
         f"Code postal: {row['location_postalcode']}",
         f"Département: {row['location_department']}",
         f"Région: {row['location_region']}",
+        f"Periodes: {row['timings']}",
         f"Date: {row['daterange_fr']}",
-        f"Début: {row['firstdate_begin']}",
-        f"Fin: {row['lastdate_end']}",
+        f"Firstdate_debut: {row['firstdate_begin']}",
+        f"Lastdate_fin: {row['lastdate_end']}",
         f"Lien: {row['canonicalurl']}"
         # f"Event_en_cours: {row['event_actif']}"
     ]
