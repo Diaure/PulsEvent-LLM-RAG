@@ -48,21 +48,22 @@ ragas_embeddings = HuggingFaceEmbeddings(
 # ============================
 
 questions_test = [
-    "Je cherche un atelier pour un enfant à Reims.",
-    "Quels événements sont prévus ce week-end à Strasbourg ?",
-    "Y a-t-il des concerts gratuits à Metz ?",
-    "Quels événements sont adaptés aux seniors à Nancy ?",
+    "Y a-t-il un concert à Strasbourg ?",
+    "Je cherche un atelier pour un enfant de 8 ans à Reims.",
+    "Quels événements sont prévus ce week-end à Metz ?",
+    "Y a-t-il des événements gratuits à Nancy ?",
     "Que faire en famille à Mulhouse demain ?",
-    "Je cherche des ateliers créatifs à Champagne et Charleville-Mézières."
+    "Je cherche des ateliers à Charleville-Mézières.",
+    "Quels événements sont adaptés aux seniors à Colmar ?",
+    "Je cherche une exposition le mois prochain à Strasbourg.",
+    "Je cherche un événement culturel à Tokyo."
+    "Je cherche un cours de plongée sous-marine à Reims."
 ]
 
 ground_truths = [
-    "Pour un enfant à Reims, j’ai repéré plusieurs activités adaptées : un atelier culinaire pour les 6–12 ans, un atelier “bacs de fouilles” accessible dès 8 ans, et une activité familiale autour de la grande maquette.",
-    "Ce week-end à Strasbourg, il y a un concert jazz au Palais Rohan, un atelier famille au Musée Alsacien, et une visite guidée de la Neustadt.",
-    "Oui, à Metz il y a un concert gratuit de musique classique à l’Arsenal, ainsi qu’un concert en plein air au Parc de la Seille.",
-    "À Nancy, plusieurs activités conviennent bien aux seniors : un atelier bien-être au Centre Jean Prouvé, une conférence sur le patrimoine au Musée Lorrain, et une balade culturelle dans la vieille ville.",
-    "Pour une sortie en famille à Mulhouse demain, vous pouvez faire un atelier créatif au Musée des Beaux-Arts, visiter le Parc Zoologique et Botanique, ou participer à une animation scientifique à la Cité du Train.",
-    "À Champagne et à Charleville-Mézières, il y a plusieurs ateliers créatifs intéressants : aquarelle, dessin, BD, et des activités manuelles dans les médiathèques."
+    "",
+    "Les ateliers adaptés à un enfant de 6 ans à Reims sont les ateliers culinaires pour enfants à La Belle Enchantée, l'atelier familial « La grande maquette » au FRAC Champagne-Ardenne et la visite « Les coulisses de la création » à La Comédie de Reims. La réponse doit préciser les dates, les conditions de participation, les tranches d'âge concernées et les liens des événements lorsque ces informations sont disponibles.",
+    
 ]
 
 # ============================

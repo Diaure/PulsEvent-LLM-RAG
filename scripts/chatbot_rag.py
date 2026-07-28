@@ -2,8 +2,9 @@ import numpy as np
 import os
 import pickle
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import dateutil.parser
+import unicodedata
 
 import faiss
 from datetime import datetime
@@ -21,6 +22,7 @@ index = faiss.read_index("./faiss_index/faiss.idx")
 
 with open("./faiss_index/metadata.pkl", "rb") as f:
     metadata = pickle.load(f)
+    # print(metadata[0]['city'])
 
 print(index.ntotal)
 print(len(metadata))
@@ -43,7 +45,7 @@ def embed_query(query): # récupère le prompt, transforme en vecteur nupérique
 
 # Vérifier si l'évènement est actif
 def est_actif(event):
-    if event["t"] is None:
+    if event["title"] is None:
         return False
 
     date_fin = datetime.fromisoformat(event["lastdate_end"].replace("Z", "+00:00"))
@@ -55,34 +57,52 @@ def normalize_city(value):
         return value.strip().lower().split("(")[0].strip()
     return None
 
-# for e in metadata:
-#     if normalize_city(e.get("city")) == "strasbourg":
-#         print(e["title"], e["firstdate_begin"], e["lastdate_end"], e.get("timing_begin"), e.get("timing_end"))
+# Fonction pour mormaliser les villes
+def normalize_city(city):
+    if city is None:
+        return None
 
+    city = str(city).lower().strip()
+    city = ''.join(c for c in unicodedata.normalize("NFD", city) if unicodedata.category(c) != "Mn")
 
-# Détecter automatiquement les villes
-def extraire_ville(question: str):
+    return city
+
+# extraction automatique des villes
+def extraire_ville(question):
     # Normaliser la question
-    question_lower = str(question).lower()
+    # question_lower = normalize_city(question)
+    q = unicodedata.normalize("NFD", question.lower())
+    q = ''.join(c for c in q if unicodedata.category(c) != "Mn")
 
-    # Extraire toutes les villes valides (uniquement les strings)
+    # Extraire toutes les villes valides
     villes_disponibles = {
         normalize_city(e.get("city"))
         for e in metadata
         if normalize_city(e.get("city")) is not None}
+    
+    # si la question contient une ville hors base → on bloque
+    # mots = re.findall(r"[a-zA-Zéèêàùûôç]+", question_lower)
+    # for mot in mots:
+    #     if mot in question_lower and mot not in villes_disponibles:
+    #         return "ville_inconnue"
 
     # Chercher une ville dans la question
     for ville in villes_disponibles:
-        if ville in question_lower:
+        if ville in q:
             return ville
-
     return None
 
 
 # Compréhension temporelle
 def extraire_intervalle_temporel(question: str):
     question = question.lower().strip()
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
+
+    def aware(dt):
+        # Convertit n'importe quelle date naive en UTC aware
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
 
     # aujourd'hui / demain / après-demain / hier
     if "aujourd'hui" in question:
@@ -118,25 +138,25 @@ def extraire_intervalle_temporel(question: str):
 
     # cette semaine / semaine prochaine
     if "cette semaine" in question:
-        start = now - timedelta(days=now.weekday())
-        end = start + timedelta(days=6)
+        start = aware(now - timedelta(days=now.weekday()))
+        end = aware(start + timedelta(days=6))
         return start, end
 
     if "la semaine prochaine" in question:
-        start = now - timedelta(days=now.weekday()) + timedelta(days=7)
-        end = start + timedelta(days=6)
+        start = aware(now - timedelta(days=now.weekday()) + timedelta(days=7))
+        end = aware(start + timedelta(days=6))
         return start, end
 
     # ce week-end
     if "week-end" in question or "weekend" in question:
-        saturday = now + timedelta(days=(5 - now.weekday()) % 7)
-        sunday = saturday + timedelta(days=1)
+        saturday = aware(now + timedelta(days=(5 - now.weekday()) % 7))
+        sunday = aware(saturday + timedelta(days=1))
         return saturday, sunday
 
     # mois prochain
     if "mois prochain" in question:
-        start = (now.replace(day=1) + timedelta(days=32)).replace(day=1)
-        end = (start + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+        start = aware((now.replace(day=1) + timedelta(days=32)).replace(day=1))
+        end = aware((start + timedelta(days=32)).replace(day=1) - timedelta(days=1))
         return start, end
 
     # en septembre 2026
@@ -146,18 +166,18 @@ def extraire_intervalle_temporel(question: str):
         annee = int(m.group(2))
         try:
             mois_num = dateutil.parser.parse(mois_nom).month
-            start = datetime(annee, mois_num, 1)
-            end = (start + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+            start = aware(datetime(annee, mois_num, 1))
+            end = aware((start + timedelta(days=32)).replace(day=1) - timedelta(days=1))
             return start, end
         except:
             pass
 
     # le 12 août 2026
-    try:
-        d = dateutil.parser.parse(question, fuzzy=True)
-        return d, d
-    except:
-        pass
+    # try:
+    #     d = dateutil.parser.parse(question, fuzzy=True)
+    #     return aware(d), aware(d)
+    # except:
+    #     pass
 
     # du 5 au 7 juillet
     m = re.search(r"du (\d{1,2}) au (\d{1,2}) ([a-zéû]+)", question)
@@ -167,46 +187,81 @@ def extraire_intervalle_temporel(question: str):
         mois_nom = m.group(3)
         try:
             mois_num = dateutil.parser.parse(mois_nom).month
-            start = datetime(now.year, mois_num, jour1)
-            end = datetime(now.year, mois_num, jour2)
+            start = aware(datetime(now.year, mois_num, jour1))
+            end = aware(datetime(now.year, mois_num, jour2))
             return start, end
         except:
             pass
+
     return None
+
 
 # Filtre temporel
 def event_is_in_interval(event, start, end):
+    print("\n----------------")
+    print(event["title"])
     try:
-        debut = datetime.fromisoformat(event["timing_begin"].replace("Z", "+00:00"))
-        fin = datetime.fromisoformat(event["timing_end"].replace("Z", "+00:00"))
+        # Essayer timing_begin / timing_end
+        debut_raw = event.get("timing_begin")
+        fin_raw = event.get("timing_end")
+
+        if debut_raw and fin_raw:
+            debut = datetime.fromisoformat(debut_raw.replace("Z", "+00:00")).astimezone(timezone.utc)
+            fin = datetime.fromisoformat(fin_raw.replace("Z", "+00:00")).astimezone(timezone.utc)
+        else:
+            # Fallback: firstdate_begin / lastdate_end
+            debut = datetime.fromisoformat(event["firstdate_begin"].replace("Z", "+00:00")).astimezone(timezone.utc)
+            fin = datetime.fromisoformat(event["lastdate_end"].replace("Z", "+00:00")).astimezone(timezone.utc)
+
+        print("Début event :", debut)
+        print("Fin event :", fin)
+        print("Start :", start)
+        print("End :", end)
+        
+        print((debut <= end) and (fin >= start))
+
         return (debut <= end) and (fin >= start)
-    except:
+
+    except Exception as e:
+        print("ERREUR :", e)
         return False
 
 
 # Recherche des évènements pertinents en fonction de l'actualité de l'évènement au moment de l'envoi du prompt
-def recherche_event_pertinent(query, k = 40, max_results = 5):
+def recherche_event_pertinent(query, k = 100, max_results = 20):
     q_emb = embed_query(query) # transforme le prompt en numérique
     distances, indices = index.search(np.array(q_emb, dtype="float32").reshape(1, -1), k) # transforme la liste de floats en tableau numpy avec vecteurs et dimension
 
     intervalle = extraire_intervalle_temporel(query)
     ville = extraire_ville(query)
 
+    print("VILLE EXTRAITE :", ville)
+    print("INTERVALLE :", intervalle)
+
     # extraction âge
     m = re.search(r"(\d+)\s*ans", query.lower())
-    age_min = int(m.group(1)) if m else None
+    age_demande = int(m.group(1)) if m else None
 
     # extraction mots-clés
-    mots_cles = re.findall(r"[a-zA-Zéèêàùûôç]+", query.lower())
+    # mots_cles = re.findall(r"[a-zA-Zéèêàùûôç]+", query.lower())
 
     results = []
     uid_vu = set()
 
+    nb_actif = 0
+    nb_ville = 0
+    nb_date = 0
+    nb_age = 0
+
     for idx in indices[0]:
         event = metadata[idx]
+        
+        print("\n---------------------")
+        print("\nEvent:", event["title"])
 
         # éviter doublons
         if event["uid"] in uid_vu:
+            print("REJET uid")
             continue
 
         # filtre actif
@@ -217,29 +272,69 @@ def recherche_event_pertinent(query, k = 40, max_results = 5):
         except:
             continue
 
+        # filtre actif
+        if not est_actif(event):
+            print("-> rejet actif")
+            continue
+        print("-> actif OK")
+        nb_actif += 1
+
         # filtre ville
-        city_event = normalize_city(event.get("city"))
+        print("Ville question :", ville)
+        print("Ville event :", event["city"])
         if ville is not None:
-            if city_event != ville:
+            if normalize_city(event.get("city")) != ville:
+                print("-> rejet ville")
                 continue
+        nb_ville += 1
+        print("-> ville OK")
 
         # # filtre âge
-        if age_min is not None:
-            if event.get("age_minimum", 0) > age_min:
+        if age_demande is not None:
+            age_min_event = event.get("age_minimum")
+            age_max_event = event.get("age_maximum")
+
+            # si l'événement ne possède pas d'information d'âge
+            if age_min_event is None and age_max_event is None:
                 continue
+
+            # si seul l'âge minimum est renseigné
+            if age_min_event is not None and age_demande < age_min_event:
+                continue
+
+            # si seul l'âge maximum est renseigné
+            if age_max_event is not None and age_demande > age_max_event:
+                        continue
+        nb_age += 1
+        print("-> âge OK")
 
         # filtre temporel
         if intervalle is not None:
+            print("-> passage filtre temporel")
             start, end = intervalle
             if not event_is_in_interval(event, start, end):
+                print("-> rejet temporel")
                 continue
+        nb_date += 1
+        print("-> temporel OK")
            
         uid_vu.add(event["uid"])
         results.append(event)
 
         if len(results) == max_results:
             break
+
+    print("\n========== DEBUG ==========")
+    print("Ville détectée :", ville)
+    print("Intervalle :", intervalle)
+    print("Après filtre actif :", nb_actif)
+    print("Après filtre ville :", nb_ville)
+    print("Après filtre âge :", nb_age)
+    print("Après filtre temporel :", nb_date)
+    print("Résultats finaux :", len(results))
+    print("===========================\n")
     return results
+
 
 # Définition du prompt
 prompt = ChatPromptTemplate.from_template(
@@ -327,9 +422,9 @@ class PulsEventRAG:
         return generate_answer(question)
 
 # Tests
-# print(generate_answer("Je cherche un atelier pour un enfant à Reims."))
-print(generate_answer("Quels événements sont prévus le mois prochain à Strasbourg?"))
+# print(generate_answer("Je cherche un atelier pour un enfant à Reims le mois prochaine."))
+# print(generate_answer("Quels événements sont prévus le mois prochain à Strasbourg ?"))
 # print(generate_answer("Y a-t-il des concerts gratuits à Metz?"))
 # print(generate_answer("Quels événements sont adaptés aux seniors à Nancy?"))
 # print(generate_answer("Que faire en famille à Mulhouse en septembre?"))
-# print(generate_answer("Je cherche des ateliers créatifs à Champagne et Charleville-Mézières."))
+print(generate_answer("Quels événements sont prévus en septembre à Metz ?"))

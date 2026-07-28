@@ -4,7 +4,7 @@ from scripts.chatbot_rag import PulsEventRAG
 
 app = FastAPI(
     title = "PulsEvent RAG API",
-    description = "API REST pour interroger le système RAG PulsEvent",
+    description = "API REST pour interroger le système RAG Puls-Event",
     version = "1.0")
 
 rag = PulsEventRAG()
@@ -23,3 +23,4 @@ def ask_question(payload: AskRequest):
 def rebuild_index():
     msg = rag.rebuild_index()
     return {"status": msg}
+
