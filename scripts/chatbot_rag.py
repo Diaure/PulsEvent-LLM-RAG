@@ -57,28 +57,18 @@ def normalize_city(value):
         return value.strip().lower().split("(")[0].strip()
     return None
 
-# Fonction pour mormaliser les villes
-def normalize_city(city):
-    if city is None:
-        return None
-
-    city = str(city).lower().strip()
-    city = ''.join(c for c in unicodedata.normalize("NFD", city) if unicodedata.category(c) != "Mn")
-
-    return city
 
 # extraction automatique des villes
 def extraire_ville(question):
     # Normaliser la question
-    # question_lower = normalize_city(question)
     q = unicodedata.normalize("NFD", question.lower())
     q = ''.join(c for c in q if unicodedata.category(c) != "Mn")
 
     # Extraire toutes les villes valides
-    villes_disponibles = {
+    villes_disponibles = list(set(
         normalize_city(e.get("city"))
         for e in metadata
-        if normalize_city(e.get("city")) is not None}
+        if normalize_city(e.get("city")) is not None))
     
     # si la question contient une ville hors base → on bloque
     # mots = re.findall(r"[a-zA-Zéèêàùûôç]+", question_lower)
@@ -87,8 +77,11 @@ def extraire_ville(question):
     #         return "ville_inconnue"
 
     # Chercher une ville dans la question
+    villes_disponibles.sort(key=len, reverse=True)
     for ville in villes_disponibles:
-        if ville in q:
+        pattern = r"\b" + re.escape(ville) + r"\b"
+        if re.search(pattern, q):
+        # if ville in q:
             return ville
     return None
 
@@ -427,4 +420,4 @@ class PulsEventRAG:
 # print(generate_answer("Y a-t-il des concerts gratuits à Metz?"))
 # print(generate_answer("Quels événements sont adaptés aux seniors à Nancy?"))
 # print(generate_answer("Que faire en famille à Mulhouse en septembre?"))
-print(generate_answer("Quels événements sont prévus en septembre à Metz ?"))
+print(generate_answer("Je cherche un cours de plongée sous-marine à Reims."))

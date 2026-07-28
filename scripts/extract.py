@@ -38,12 +38,12 @@ for debut, fin in periodes:
         "refine": [
             "location_region:Grand Est"
         ],
-        # "where": (
+        "where": (
             # f'firstdate_begin >= "{debut}" '
             # f'AND firstdate_begin < "{fin}"'
-        #     f'lastdate_begin >= "{debut}" '
-        #     f'AND firstdate_begin < "{fin}"'
-        # ),
+            f'lastdate_begin >= "{debut}" '
+            f'AND firstdate_begin < "{fin}"'
+        ),
         "limit": limit,
         "offset": 0}
 

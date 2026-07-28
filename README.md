@@ -115,3 +115,160 @@ Objectif: Créer un index vectoriel **FAISS** à partir des embeddings généré
 - Sauvegarde les métadonnées associées à chaque vecteur (`metadata.pkl`): uid, titre, ville, dates, lien, chunk de texte, statut actif
 
 Ces métadonnées permettent de reconstruire la réponse du chatbot après une recherche FAISS.
+
+## Développement du chatbot intelligent (RAG)
+
+### Fonctionnement général
+
+Le chatbot intelligent Puls-Event repose sur une architecture RAG (Retrieval-Augmented Generation) permettant d'interroger la base d'évènements indexés de manière sémantique.
+
+Lorsqu'un utilisateur pose une question, plusieurs étapes sont exécutées:
+
+1. La question est vectorisée à l'aide du modèle d'embedding Mistral.
+2. Une recherche sémantique est effectuée dans l'index FAISS afin de récupérer les chunks les plus pertinents.
+3. Les chunks récupérés sont filtrés et regroupés par évènement afin d'éviter les doublons.
+4. Les métadonnées associées aux évènements sont utilisées pour reconstruire le contexte.
+5. Le modèle de langage génère une réponse adaptée à la requête de l'utilisateur.
+
+Le chatbot est donc capable de:
+
+- rechercher des évènements par thématique
+- proposer des activités adaptées aux contraintes exprimées par l'utilisateur
+- répondre à des questions générales sur les évènements disponibles
+- fournir les informations utiles (dates, lieu, description, lien vers l'évènement).
+
+### Recherche sémantique
+
+Le moteur de recherche utilise:
+
+- l'index vectoriel FAISS construit précédemment
+- les embeddings générés avec le modèle `mistral-embed`
+- les métadonnées sauvegardées dans `metadata.pkl`.
+
+La recherche s'effectue sur les chunks les plus proches de la requête utilisateur afin de récupérer uniquement les informations pertinentes.
+
+### Génération des réponses
+
+Une fois les évènements pertinents récupérés:
+
+- les informations sont injectées dans un prompt construit dynamiquement
+- le LLM reçoit uniquement le contexte nécessaire
+- le modèle génère une réponse naturelle.
+
+Lorsque plusieurs évènements correspondent à la demande, le chatbot peut retourner une liste structurée contenant:
+
+- le titre de l'évènement
+- la ville
+- la date
+- le lieu
+- le lien OpenAgenda associé.
+
+### Reconstruction de l'index
+
+Une méthode dédiée permet également de reconstruire automatiquement l'ensemble du pipeline RAG.
+
+Cette reconstruction exécute successivement:
+
+- le preprocessing
+- le chunking
+- la génération des embeddings
+- la création de l'index FAISS.
+
+Cette fonctionnalité facilite la mise à jour régulière des données lorsque de nouveaux évènements sont disponibles.
+
+## Évaluation du chatbot
+
+Afin d'évaluer les performances du système RAG, plusieurs jeux de questions ont été construits.
+
+L'évaluation porte notamment sur:
+
+- la pertinence des évènements proposés
+- la qualité des réponses générées
+- la capacité du chatbot à comprendre des formulations variées
+- la robustesse face aux questions hors contexte.
+
+Les tests ont été réalisés sur différentes catégories de requêtes:
+
+- recherche d'évènements culturels
+- recherche d'activités selon une ville ou une période
+- recommandations personnalisées
+- questions générales sur les évènements disponibles.
+
+Les réponses générées ont été exportées dans un fichier CSV afin de pouvoir être comparées et analysées.
+
+Les principaux indicateurs étudiés sont:
+
+- **F**aithfulness**: cohérence entre la réponse et le contexte récupéré ;
+- **Answer Relevancy**: pertinence de la réponse apportée ;
+- **Context Precision**: qualité des documents retrouvés ;
+- **Context Recall**: capacité à récupérer les informations attendues.
+
+Ces métriques permettent d'évaluer la qualité globale du pipeline RAG et d'identifier les pistes d'amélioration du système.
+
+## Création d'une API REST
+
+Le chatbot est exposé sous la forme d'une API REST développée avec FastAPI.
+
+L'API permet :
+
+- d'interroger le chatbot via une requête HTTP ;
+- de reconstruire automatiquement l'index vectoriel ;
+- d'intégrer facilement le système RAG dans une application tierce.
+
+L'API est lancée depuis la racine du projet: `uvicorn api.api_rag:app --reload`, et est accessible sur `
+http://localhost:8000`. 
+
+La documentation interactive Swagger est disponible sur `
+http://localhost:8000/docs`
+
+### Endpoints disponibles
+
+1. **Poser une question**
+
+Endpoint: ***POST/ask***
+
+`json
+{"question": "Quels sont les évènements organisés à Strasbourg ce week-end ?"}`
+
+***Réponse***
+
+`json
+{
+    "question": "...",
+    "answer": "..."
+}`
+
+2. **Reconstruire l'index**
+
+Endpoint: ***POST/rebuild***
+
+`json
+{"statut": "Index reconstruit avec succès"}`
+
+
+````markdown
+## Interface utilisateur avec Streamlit
+
+Une interface graphique a été développée avec Streamlit afin de rendre l'utilisation du chatbot plus intuitive.
+
+L'application permet:
+
+- de dialoguer avec le chatbot via une interface conversationnelle
+- d'afficher les évènements sous forme de cartes interactives
+- de conserver l'historique des échanges durant la session
+- d'interroger directement l'API REST.
+
+Les évènements proposés sont automatiquement affichés avec:
+
+- leur titre
+- leur ville
+- leur date
+- leur lieu
+- un lien vers la page officielle OpenAgenda.
+
+### Lancement de l'application
+
+Après avoir lancé l'API FastAPI, lancer l'interface Streamlit:
+
+```bash
+streamlit scripts/run rag_streamlit.py
