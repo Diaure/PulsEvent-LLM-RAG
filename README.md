@@ -272,3 +272,14 @@ Après avoir lancé l'API FastAPI, lancer l'interface Streamlit:
 
 ```bash
 streamlit scripts/run rag_streamlit.py
+
+
+
+
+
+
+Dans mon fichier de tests des filtres, je vérifie 3 choses.
+- D’abord, que le statut event_actif est correct : un événement futur est actif, un événement passé ou invalide est inactif.
+- Ensuite, je teste event_is_in_interval, qui vérifie si un événement tombe dans la période demandée, y compris les cas fallback et les dates invalides.
+- Enfin, je teste aussi extraire_ville, qui doit détecter correctement la ville dans la question.
+Tous ces tests sont regroupés dans un seul fichier, sans ajouter de nouvelles fonctions dans mon code de production
