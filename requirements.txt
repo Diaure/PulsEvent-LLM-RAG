@@ -5,7 +5,7 @@ annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.14.1
 appdirs==1.4.4
-asttokens @ file:///home/conda/feedstock_root/build_artifacts/asttokens_1763409923949/work
+asttokens==3.0.1
 attrs==26.1.0
 certifi==2026.6.17
 charset-normalizer==3.4.7
