@@ -8,6 +8,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      CI: True 
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

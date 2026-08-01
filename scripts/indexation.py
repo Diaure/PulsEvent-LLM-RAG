@@ -2,6 +2,7 @@ import pandas as pd
 import pickle
 import numpy as np
 import faiss
+import os
 
 # Chargement des chnks
 with open("./data/embeddings.pkl", "rb") as f:
@@ -15,7 +16,12 @@ print("Taille des vecteurs :", vectors.shape)
 
 # Initialisation de l'index Faiss
 dimension = vectors.shape[1]
-index = faiss.IndexFlatL2(dimension)
+
+if os.getenv("CI") != "true":
+    index = faiss.read_index("./faiss_index/faiss.idx")
+else:
+    d = 384 # pour ci/cd
+    index = faiss.IndexFlatL2(dimension)
 
 # Ajout des embeddings à l'index
 index.add(vectors)
