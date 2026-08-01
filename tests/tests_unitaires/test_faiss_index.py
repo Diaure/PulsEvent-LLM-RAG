@@ -11,7 +11,9 @@ def test_faiss_index_creation():
 
     # 1. Création de l’index
     dimension = vectors.shape[1]
-    index = faiss.IndexFlatL2(dimension)
+    # index = faiss.IndexFlatL2(dimension)
+    d = 384  # dimension arbitraire
+    index = faiss.IndexFlatL2(d)
 
     # 2. Ajout des vecteurs
     index.add(vectors)
