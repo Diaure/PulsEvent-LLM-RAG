@@ -25,13 +25,29 @@ def load_faiss_index():
         d = 384
         index = faiss.IndexFlatL2(d)
 
-        metadata = [{"uid": i, "city": "reims"} for i in range(100)]
+        metadata = [
+        {
+            "uid": i,
+            "title": f"Mock Event {i}",
+            "city": "reims",
+            "canonicalurl": "https://example.com",
+            "chunk": "mock chunk",
+            "lieu": "mock",
+            "date": "2026-01-01",
+            "timing_begin": "10:00",
+            "timing_end": "18:00",
+            "firstdate_begin": "2026-01-01T10:00:00Z",
+            "lastdate_end": "2099-01-01T00:00:00Z",
+            "conditions": "",
+            "age_minimum": 0,
+            "age_maximum": 99
+        } for i in range(200)]
+
         return index, metadata
     else:
         index = faiss.read_index("./faiss_index/faiss.idx")
         with open("./faiss_index/metadata.pkl", "rb") as f:
             metadata = pickle.load(f)
-            # print(metadata[0]['city'])
         return index, metadata
 
 

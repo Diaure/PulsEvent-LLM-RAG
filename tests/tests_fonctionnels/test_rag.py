@@ -60,13 +60,6 @@ def test_rag_filtrage():
 def test_rag_pipeline_complet():
     question = "Que faire à Reims demain pour un enfant de 8 ans ?"
 
-    # On récupère l’intervalle réel
-    # start, end = extraire_intervalle_temporel(question)
-
-    # On élargit l’intervalle à toute la journée
-    # start = datetime.combine(start.date(), datetime.min.time(), tzinfo=timezone.utc)
-    # end   = datetime.combine(end.date(), datetime.max.time(), tzinfo=timezone.utc)
-
     results = recherche_event_pertinent(question)
 
     # Le pipeline doit renvoyer une liste

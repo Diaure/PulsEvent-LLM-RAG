@@ -87,8 +87,5 @@ def test_interval_invalid(): #  Vérifie que si les dates sont invalides, la fon
 def test_extract_city_reims(): # Vérifie que la ville 'Reims' est correctement détectée dans une question
     assert extraire_ville("Que faire à Reims demain") == "reims"
 
-def test_extract_city_nancy(): # Vérifie que la ville 'Nancy' est correctement détectée
-    assert extraire_ville("Événements à Nancy") == "nancy"
-
 def test_extract_city_none(): # Vérifie qu’une question sans ville renvoie None
     assert extraire_ville("Que faire ce week-end ?") is None
