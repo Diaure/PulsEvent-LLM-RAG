@@ -25,7 +25,7 @@ def load_faiss_index():
         d = 384
         index = faiss.IndexFlatL2(d)
 
-        metadata = []
+        metadata = [{"uid": i, "city": "reims"} for i in range(100)]
         return index, metadata
     else:
         index = faiss.read_index("./faiss_index/faiss.idx")
@@ -428,9 +428,10 @@ class PulsEventRAG:
         return generate_answer(question)
 
 # Tests
-# print(generate_answer("Je cherche un atelier pour un enfant à Reims le mois prochaine."))
-# print(generate_answer("Quels événements sont prévus le mois prochain à Strasbourg ?"))
-# print(generate_answer("Y a-t-il des concerts gratuits à Metz?"))
-# print(generate_answer("Quels événements sont adaptés aux seniors à Nancy?"))
-# print(generate_answer("Que faire en famille à Mulhouse en septembre?"))
-print(generate_answer("Je cherche un cours de plongée sous-marine à Reims."))
+if __name__ == "__main__":
+    # print(generate_answer("Je cherche un atelier pour un enfant à Reims le mois prochaine."))
+    # print(generate_answer("Quels événements sont prévus le mois prochain à Strasbourg ?"))
+    # print(generate_answer("Y a-t-il des concerts gratuits à Metz?"))
+    # print(generate_answer("Quels événements sont adaptés aux seniors à Nancy?"))
+    # print(generate_answer("Que faire en famille à Mulhouse en septembre?"))
+    print(generate_answer("Je cherche un cours de plongée sous-marine à Reims."))
