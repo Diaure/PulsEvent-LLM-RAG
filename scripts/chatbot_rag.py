@@ -18,14 +18,18 @@ load_dotenv()
 api_key = os.getenv("PULSEVENT_MISTRAL_KEY")
 
 # Chargement des index + metadonnées
-index = faiss.read_index("./faiss_index/faiss.idx")
-
-with open("./faiss_index/metadata.pkl", "rb") as f:
-    metadata = pickle.load(f)
-    # print(metadata[0]['city'])
-
-print(index.ntotal)
-print(len(metadata))
+def load_faiss_index():
+    # Charge FAISS en local, mock en CI/CD.
+    if os.getenv("CI") == "true":
+        # Mock FAISS index pour CI/CD
+        d = 384
+        return faiss.IndexFlatL2(d)
+    else:
+        index = faiss.read_index("./faiss_index/faiss.idx")
+        with open("./faiss_index/metadata.pkl", "rb") as f:
+            metadata = pickle.load(f)
+            # print(metadata[0]['city'])
+        return index, metadata
 
 
 # Configuration de la connexion à l'API Mistral
@@ -221,6 +225,7 @@ def event_is_in_interval(event, start, end):
 
 
 # Recherche des évènements pertinents en fonction de l'actualité de l'évènement au moment de l'envoi du prompt
+index, metadata = load_faiss_index()
 def recherche_event_pertinent(query, k = 100, max_results = 20):
     q_emb = embed_query(query) # transforme le prompt en numérique
     distances, indices = index.search(np.array(q_emb, dtype="float32").reshape(1, -1), k) # transforme la liste de floats en tableau numpy avec vecteurs et dimension
@@ -395,8 +400,7 @@ def generate_answer(question):
 class PulsEventRAG:
     def __init__(self):
         # On réutilise directement TON index FAISS et TES metadata
-        self.index = index
-        self.metadata = metadata
+        self.index, self.metadata = load_faiss_index()
 
         # Embeddings déjà configurés
         self.embeddings = embeddings_model
