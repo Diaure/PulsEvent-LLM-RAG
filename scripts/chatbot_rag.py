@@ -23,7 +23,10 @@ def load_faiss_index():
     if os.getenv("CI") == "true":
         # Mock FAISS index pour CI/CD
         d = 384
-        return faiss.IndexFlatL2(d)
+        index = faiss.IndexFlatL2(d)
+
+        metadata = []
+        return index, metadata
     else:
         index = faiss.read_index("./faiss_index/faiss.idx")
         with open("./faiss_index/metadata.pkl", "rb") as f:
@@ -37,11 +40,23 @@ embed_client = Mistral(api_key=api_key)
 model_embed = "mistral-embed"
 model_llm = "mistral-large-latest"
 
-# Choix du modèle pour la transformation en représentation numérique (compatible avec RAGAS)
-embeddings_model = MistralAIEmbeddings(api_key = api_key, model = model_embed)
+if os.getenv("CI") == "true":
+    class MockEmbeddings:
+        def embed_query(self, text):
+            return np.random.rand(384).tolist()
+    embeddings_model = MockEmbeddings()
 
-# Modèle pour générer la réponse (LLM)
-chatbot_llm = ChatMistralAI(model = model_llm, api_key=api_key)
+    class MockLLM:
+        def invoke(self, text):
+            return "Réponse mock CI/CD"
+    chatbot_llm = MockLLM()
+
+else:
+    # Choix du modèle pour la transformation en représentation numérique (compatible avec RAGAS)
+    embeddings_model = MistralAIEmbeddings(api_key = api_key, model = model_embed)
+
+    # Modèle pour générer la réponse (LLM)
+    chatbot_llm = ChatMistralAI(model = model_llm, api_key=api_key)
 
 # Fonction pour l'embedding du prompt de l'utilisateur
 def embed_query(query): # récupère le prompt, transforme en vecteur nupérique (token > passage dans le transformer spécialisé > extraction > normalisation > renvoi du vecteur) 
@@ -64,6 +79,7 @@ def normalize_city(value):
 
 # extraction automatique des villes
 def extraire_ville(question):
+    index, metadata = load_faiss_index()
     # Normaliser la question
     q = unicodedata.normalize("NFD", question.lower())
     q = ''.join(c for c in q if unicodedata.category(c) != "Mn")
@@ -73,19 +89,12 @@ def extraire_ville(question):
         normalize_city(e.get("city"))
         for e in metadata
         if normalize_city(e.get("city")) is not None))
-    
-    # si la question contient une ville hors base → on bloque
-    # mots = re.findall(r"[a-zA-Zéèêàùûôç]+", question_lower)
-    # for mot in mots:
-    #     if mot in question_lower and mot not in villes_disponibles:
-    #         return "ville_inconnue"
 
     # Chercher une ville dans la question
     villes_disponibles.sort(key=len, reverse=True)
     for ville in villes_disponibles:
         pattern = r"\b" + re.escape(ville) + r"\b"
         if re.search(pattern, q):
-        # if ville in q:
             return ville
     return None
 
@@ -225,8 +234,8 @@ def event_is_in_interval(event, start, end):
 
 
 # Recherche des évènements pertinents en fonction de l'actualité de l'évènement au moment de l'envoi du prompt
-index, metadata = load_faiss_index()
 def recherche_event_pertinent(query, k = 100, max_results = 20):
+    index, metadata = load_faiss_index()
     q_emb = embed_query(query) # transforme le prompt en numérique
     distances, indices = index.search(np.array(q_emb, dtype="float32").reshape(1, -1), k) # transforme la liste de floats en tableau numpy avec vecteurs et dimension
 
