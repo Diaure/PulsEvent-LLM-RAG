@@ -1,17 +1,23 @@
 import numpy as np
+import json
+import requests
 import os
 import pickle
 import re
+from pathlib import Path
 from datetime import datetime, timedelta, timezone
+from collections import Counter
 import dateutil.parser
 import unicodedata
 
 import faiss
 from datetime import datetime
+import time
 from dotenv import load_dotenv
 from mistralai import Mistral
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_mistralai import ChatMistralAI, MistralAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # Chargement clé API
 load_dotenv()
@@ -319,15 +325,15 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
 
             # si l'événement ne possède pas d'information d'âge
             if age_min_event is None and age_max_event is None:
-                continue
+                pass
 
             # si seul l'âge minimum est renseigné
-            if age_min_event is not None and age_demande < age_min_event:
+            elif age_min_event is not None and age_demande < age_min_event:
                 continue
 
             # si seul l'âge maximum est renseigné
-            if age_max_event is not None and age_demande > age_max_event:
-                        continue
+            elif age_max_event is not None and age_demande > age_max_event:
+                continue
         nb_age += 1
         print("-> âge OK")
 
@@ -377,7 +383,13 @@ Consignes:
 - Il est interdit d'utiliser tes connaissances générales.
 - Il est interdit d'inventer un événement.
 - Tu n'as pas accès à Internet.
-- Si le contexte est vide, réponds exactement: "Je n'ai trouvé aucun événement correspondant à votre recherche dans la base de données."
+- Si le contexte est vide ou si la ville demandée n'est pas présente dans la région Grand Est: 
+    -Tu dois répondre EXACTEMENT la phrase suivante, sans rien ajouter: "Je n'ai trouvé aucun événement correspondant à votre recherche dans la base de données."
+    - Tu NE DOIS PAS proposer d’alternatives.
+    - Tu NE DOIS PAS suggérer d’autres villes.
+    - Tu NE DOIS PAS recommander d’autres événements.
+    - Tu NE DOIS PAS ajouter d’explications.
+    - Tu NE DOIS PAS reformuler la phrase.
 - Mentionne le titre, la ville, les dates, les conditions, l'âge minimum et maximum et le lien quand c'est possible.
 
 Réponse :
@@ -424,30 +436,312 @@ def generate_answer(question):
 # Classe pour API
 class PulsEventRAG:
     def __init__(self):
+        try:
         # On réutilise directement TON index FAISS et TES metadata
-        self.index, self.metadata = load_faiss_index()
+            self.index, self.metadata = self.load_index()
+        except Exception as e:
+            print("Erreur dans __init__ :", e)
+            self.index, self.metadata = None, None
 
-        # Embeddings déjà configurés
-        self.embeddings = embeddings_model
+    # 1. Extraction
+    def _extract(self):
+        print("Début extraction", flush=True)
+        URL = ("https://public.opendatasoft.com/api/explore/v2.1/"
+            "catalog/datasets/evenements-publics-openagenda/records")
 
-        # LLM déjà configuré
-        self.llm = chatbot_llm
+        PERIODES = [
+            ("2025-01-01T00:00:00+00:00", "2025-04-01T00:00:00+00:00"),
+            ("2025-04-01T00:00:00+00:00", "2025-07-01T00:00:00+00:00"),
+            ("2025-07-01T00:00:00+00:00", "2025-10-01T00:00:00+00:00"),
+            ("2025-10-01T00:00:00+00:00", "2026-01-01T00:00:00+00:00"),
+            ("2026-01-01T00:00:00+00:00", "2026-04-01T00:00:00+00:00"),
+            ("2026-04-01T00:00:00+00:00", "2026-07-01T00:00:00+00:00"),
+            ("2026-07-01T00:00:00+00:00", "2026-10-01T00:00:00+00:00"),
+            ("2026-10-01T00:00:00+00:00", "2027-01-01T00:00:00+00:00"),]
+
+        LIMIT = 100
+        all_events = []
+
+        for debut, fin in PERIODES:
+            print(f"Période : {debut} -> {fin}", flush=True)
+            params = {
+                "refine": ["location_region:Grand Est"],
+                "where": (
+                    f'lastdate_begin >= "{debut}" '
+                    f'AND firstdate_begin < "{fin}"'
+                ),
+                "limit": LIMIT,
+                "offset": 0,}
+
+            response = requests.get(URL, params=params)
+            response.raise_for_status()
+            data = response.json()
+            total_count = data["total_count"]
+            print("Total :", total_count, flush=True)
+
+            periode_events = []
+            for offset in range(0, total_count, LIMIT):
+                params["offset"] = offset
+                response = requests.get(URL, params=params)
+                response.raise_for_status()
+                page = response.json()["results"]
+                periode_events.extend(page)
+
+            all_events.extend(periode_events)
+
+        # Suppression des doublons
+        unique = {e["uid"]: e for e in all_events}
+        return list(unique.values())   
+
+    # 2. Preprocessing 
+    def _preprocess(self, events):
+        # Evènements à exclure
+        agenda_a_exclure = [
+            "Mes événements France Travail",
+            "France-Belgique - Calendrier des évènements économiques et sectoriels",
+            "Ensemble, dialoguons - Édition 2026 | Banque de France",
+            "Ambassadeurs IA",
+            "Chambre d'agriculture de la Moselle",
+            "Chambre d'agriculture des Vosges",
+            "Chambre d'agriculture de la Meurthe-et-Moselle",
+            "Chambre d'agriculture Grand-Est",
+            "Chambre d'agriculture de la Meuse"]
+
+        # Filtres des évènements à exclure
+        filtered = []
+        for e in events:
+            origin = e.get("originagenda_title") or ""
+            if "Archive" in origin:
+                continue
+            if origin in agenda_a_exclure:
+                continue
+            filtered.append(e)
+
+        # Champs à conserver
+        champs_a_garder = ["uid", "canonicalurl", "title_fr", "description_fr", "longdescription_fr", "conditions_fr", "timings",
+                            "daterange_fr", "firstdate_begin", "lastdate_end", "location_name", "location_address", 
+                            "location_postalcode", "location_city", "location_department", "location_region", "age_min", "age_max", "registration"]
+        today = datetime.now(timezone.utc)
+        final_events = []
+
+        for e in filtered:
+            new_e = {c: e.get(c) for c in champs_a_garder}
+
+            # Statut actif
+            last_date = e.get("lastdate_end")
+            if last_date:
+                try:
+                    date_fin = datetime.fromisoformat(last_date)
+                    new_e["event_actif"] = date_fin >= today
+                except Exception:
+                    new_e["event_actif"] = False
+            else:
+                new_e["event_actif"] = False
+
+            # Construction du texte RAG
+            parts = [
+                    f"Titre: {new_e['title_fr']}",
+                    f"Description: {new_e['description_fr']}",
+                    f"Longue description: {new_e['longdescription_fr']}",
+                    f"Conditions: {new_e['conditions_fr']}",
+                    f"Lieu: {new_e['location_name']}",
+                    f"Age minimum: {new_e['age_min']}",
+                    f"Age maximum: {new_e['age_max']}",
+                    f"Ville: {new_e['location_city']}",
+                    f"Adresse: {new_e['location_address']}",
+                    f"Code postal: {new_e['location_postalcode']}",
+                    f"Département: {new_e['location_department']}",
+                    f"Région: {new_e['location_region']}",
+                    f"Periodes: {new_e['timings']}",
+                    f"Date: {new_e['daterange_fr']}",
+                    f"Firstdate_debut: {new_e['firstdate_begin']}",
+                    f"Lastdate_fin: {new_e['lastdate_end']}",
+                    f"Lien: {new_e['canonicalurl']}"]
+            texte_rag = "\n".join([p for p in parts if p])
+            new_e["texte_rag"] = texte_rag
+
+            final_events.append(new_e)
+        return final_events
+
+    # 3. Chunking
+    def _chunking(self, events):
+        # Initialisation du splitter
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=700,
+            chunk_overlap=200,
+            separators=["\n\n", "\n", ".", " ", ""])
+    
+        chunks = []
+        metadata = []
+
+        for e in events:
+            texte = e.get("texte_rag", "")
+            if not texte:
+                continue
+
+            # Extraire timing_begin / timing_end
+            raw_timings = e.get("timings")
+            timing_begin, timing_end = None, None
+
+            if raw_timings:
+                try:
+                    timings = json.loads(raw_timings) if isinstance(raw_timings, str) else raw_timings
+                    if timings and isinstance(timings, list):
+                        t0 = timings[0]
+                        timing_begin = t0.get("begin")
+                        timing_end = t0.get("end")
+                except Exception:
+                    pass
+
+            # Découpage du texte
+            for ch in text_splitter.split_text(texte):
+                chunks.append(ch)
+
+                metadata.append({
+                    "uid": e.get("uid"),
+                    "title": e.get("title_fr"),
+                    "city": e.get("location_city"),
+                    "lieu": e.get("location_name"),
+                    "date": e.get("daterange_fr"),
+                    "timing_begin": timing_begin,
+                    "timing_end": timing_end,
+                    "firstdate_begin": e.get("firstdate_begin"),
+                    "lastdate_end": e.get("lastdate_end"),
+                    "conditions": e.get("conditions_fr"),
+                    "age_minimum": e.get("age_min"),
+                    "age_maximum": e.get("age_max"),
+                    "canonicalurl": e.get("canonicalurl"),
+                    "chunk": ch
+                })
+
+        return chunks, metadata
+
+    # 4. Embeding
+    def _embeding(self, chunks):
+        api_key = os.getenv("PULSEVENT_MISTRAL_KEY")
+        if not api_key:
+            raise ValueError("❌ Clé API Mistral manquante")
+
+        client = Mistral(api_key=api_key)
+        model = "mistral-embed"
+
+        BATCH_SIZE = 18
+        vectors = []
+
+        # envoie de batch au modèle Mistral avec un temps de pause afin de gérer la limite Mistral
+        def embed_batch(batch_texts):
+            while True:
+                try:
+                    print(type(batch_texts))
+                    print(len(batch_texts))
+                    print(type(batch_texts[0]))
+                    print(batch_texts[0][:200])
+                    response = client.embeddings.create(
+                        model=model,
+                        inputs=batch_texts
+                    )
+                    return [item.embedding for item in response.data]
+
+                except Exception as e:
+                    print(repr(e))
+                    if "429" in str(e):
+                        print("⏳ Rate limit atteint → pause 5 secondes…")
+                        time.sleep(5)
+                        continue
+                    # else:
+                    raise
+
+        # Découpage en batch
+        for i in range(0, len(chunks), BATCH_SIZE):
+            batch = chunks[i:i + BATCH_SIZE]
+            print(f"Batch {i}/{len(chunks)}", flush=True)
+            batch_texts = batch  # batch = liste de strings
+
+            batch_vectors = embed_batch(batch_texts)
+            vectors.extend(batch_vectors)
+
+            # Pause légère pour éviter le 429
+            time.sleep(3)
+
+        # Conversion en tableau numpy pour FAISS
+        return np.array(vectors, dtype="float32")    
+
+    # 5. Indexation
+    def _faiss_build(self, vectors):
+        d = vectors.shape[1]  # dimension des embeddings
+        index = faiss.IndexFlatL2(d)
+        index.add(vectors)
+
+        return index
+
+    # Sauvegarde index FAISS & metadonnées
+    def _faiss_saving(self, index, metadata):
+        Path("faiss_index").mkdir(exist_ok=True)
+
+        # Sauvegarde FAISS
+        faiss.write_index(index, "./faiss_index/faiss.idx")
+
+        # Sauvegarde metadata
+        with open("./faiss_index/metadata.pkl", "wb") as f:
+            pickle.dump(metadata, f)
+
+    def load_index(self):
+        print("Chargement de l'index FAISS...")
+        try:
+            # return load_faiss_index()
+            index = faiss.read_index("./faiss_index/faiss.idx")
+            with open("./faiss_index/metadata.pkl", "rb") as f:
+                metadata = pickle.load(f)
+            return index, metadata
+        except Exception:
+            return None, None
+
 
     def rebuild_index(self):
-        # Recharge FAISS et metadata depuis les fichiers
-        self.index = faiss.read_index("./faiss_index/faiss.idx")
-        with open("./faiss_index/metadata.pkl", "rb") as f:
-            self.metadata = pickle.load(f)
+        print("===== DEBUT REBUILD =====", flush=True)
+
+        print("Extraction...", flush=True)
+        t0 = time.perf_counter()
+        events = self._extract()
+        print(f"{len(events)} événements", flush=True)
+        print(f"Extraction: {time.perf_counter() - t0:.1f} s")
+
+        print("Préprocessing...", flush=True)
+        t1 = time.perf_counter()
+        clean = self._preprocess(events)
+        print(len(clean), flush=True)
+        print(f"Préprocessing: {time.perf_counter() - t1:.1f} s")
+
+        print("Chunking...", flush=True)
+        t2 = time.perf_counter()
+        chunks, metadata = self._chunking(clean)
+        print(len(chunks), flush=True)
+        print(f"Chunking : {time.perf_counter() - t2:.1f} s")
+
+        print("Embedding...", flush=True)
+        t3 = time.perf_counter()
+        vectors = self._embeding(chunks)
+        print(f"Embeddings : {time.perf_counter() - t3:.1f} s")
+
+        print("FAISS...", flush=True)
+        t4 = time.perf_counter()
+        index = self._faiss_build(vectors)
+        print(f"Embeddings : {time.perf_counter() - t4:.1f} s")
+
+        print("Saving...", flush=True)
+        self._faiss_saving(index, metadata)
+
+        self.index = index
+        self.metadata = metadata
+
+        print("===== FIN =====", flush=True)
         return "Index reconstruit avec succès."
 
     def ask(self, question: str) -> str:
+        if self.index is None:
+            return "⚠️ L’index n’est pas encore construit. Lancez /rebuild."
         return generate_answer(question)
 
 # Tests
 if __name__ == "__main__":
-    # print(generate_answer("Je cherche un atelier pour un enfant à Reims le mois prochaine."))
-    # print(generate_answer("Quels événements sont prévus le mois prochain à Strasbourg ?"))
-    # print(generate_answer("Y a-t-il des concerts gratuits à Metz?"))
-    # print(generate_answer("Quels événements sont adaptés aux seniors à Nancy?"))
-    # print(generate_answer("Que faire en famille à Mulhouse en septembre?"))
     print(generate_answer("Je cherche un cours de plongée sous-marine à Reims."))

@@ -63,7 +63,7 @@ for idx, row in ge_events_df.iterrows():
             "canonicalurl": row["canonicalurl"],
             "chunk": chunk})
 
-print("Nombre total de chun:", len(chunk))
+print("Nombre total de chunk:", len(chunks))
 
 # Sauvegarde des chunks : les chunks sont une liste de dictionnaires python lourd, dump est le plus pratique pour conserver un fichier aussi lourd
 with open("./data/chunks.pkl", "wb") as f:

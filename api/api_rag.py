@@ -21,6 +21,8 @@ def ask_question(payload: AskRequest):
 
 @app.post("/rebuild")
 def rebuild_index():
+    print(">>> Endpoint /rebuild appelé")
     msg = rag.rebuild_index()
+    print(">>> rebuild terminé")
     return {"status": msg}
 

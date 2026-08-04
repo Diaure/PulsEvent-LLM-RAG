@@ -27,7 +27,7 @@ questions_test = [
     "Je cherche un atelier pour un enfant de 8 ans à Reims.",
     "Quels événements sont prévus ce week-end à Metz ?",
     "Y a-t-il des événements gratuits à Nancy ?",
-    "Que faire en famille à Mulhouse demain ?",
+    "Que faire en famille à Mulhouse ce week-end ?",
     "Je cherche des ateliers à Charleville-Mézières.",
     "Quels événements sont adaptés aux seniors à Colmar ?",
     "Je cherche une exposition le mois prochain à Strasbourg.",
@@ -36,16 +36,16 @@ questions_test = [
 ]
 
 ground_truths = [
-    "Oui. Les concerts de musique prévus à Strasbourg très prochainement sont le «Concert de musique classique à Strasbourg – Ensemble Musicâme France » et « Vêpres italiennes des XVIᵉ et XVIIᵉ siècles par l'Ensemble Triosa ». La réponse doit préciser les dates, les conditions de participation, les tranches d'âge concernées et les liens des événements lorsque ces informations sont disponibles.",
-    "Les ateliers adaptés à un enfant de 6 ans à Reims sont les ateliers culinaires pour enfants à La Belle Enchantée, l'atelier familial « La grande maquette » au FRAC Champagne-Ardenne et la visite « Les coulisses de la création » à La Comédie de Reims. La réponse doit préciser les dates, les conditions de participation, les tranches d'âge concernées et les liens des événements lorsque ces informations sont disponibles.",
-    "Aucun événement correspondant à la recherche d'événements prévus ce week-end à Metz n'a été trouvé dans la base de données.",
-    "Oui, il y a des évènements gratuits à Nancy. Les événements gratuits proposés à Nancy sont l'exposition « Présents » à la Galerie Poirel et « Le campus Carnot se dévoile ». La réponse doit mentionner les dates, les conditions d'accès, la gratuité des événements ainsi que les informations complémentaires utiles.",
-    "Malheureusement, aucune activité familiale correspond à la recherche à Mulhouse pour la période souhaitée n'a été trouvée dans la base de données.",
-    "Les événements les plus pertinents trouvés à Charleville-Mézières comprennent des visites guidées, un marché artisanal et des découvertes patrimoniales. La réponse doit préciser qu'aucun atelier créatif explicite n'est présent dans la base de données et proposer uniquement les événements les plus proches de la requête.",
-    "Les événements adaptés à un public senior à Colmar sont l'exposition « 4026 Des jouets éternels ? », l'ouverture exceptionnelle de la Cour d'appel de Colmar, la visite guidée de la Comédie de Colmar et la visite du bâtiment administratif du XIXe siècle. La réponse doit expliquer en quoi ces activités sont adaptées aux seniors et fournir leurs principales caractéristiques.",
-    "Aucune exposition correspondant aux critères temporels et géographiques de la recherche à Strasbourg n'a été trouvée dans la base de données.",
-    "Aucun événement culturel n'est disponible à Tokyo dans la base de données. La réponse doit uniquement indiquer l'absence de résultat et ne doit proposer aucun événement situé dans une autre ville ou région.",
-    "Aucun cours de plongée sous-marine n'a été trouvé à Reims dans la base de données. La réponse doit indiquer clairement qu'aucun événement correspondant n'est disponible."
+    "Plusieurs concerts sont disponibles à Strasbourg. Parmi les plus pertinents figurent: - Concert de musique classique à Strasbourg – Ensemble Musicâme France - Vêpres italiennes des XVIème et XVIIème siècles par l'Ensemble Triosa. Pour chacun des évènements, les dates, les conditions de participation et les informations pratiques sont indiquées lorsqu'elles sont disponibles",
+    "Voici des ateliers adaptés à un enfant de 8 ans à Reims: - Atelier "bacs de fouilles" pour les enfants - Ateliers culinaires pour enfants à la Belle Enchantée - Les coulisses de la création. Pour chacun, les dates, les conditions de participation, les tranches d'âge concernées et les liens des événements lorsque disponibles sont clairement mentionnés.",
+    "Aucun événement correspondant à cette recherche n'est présent dans la base de données. La réponse n'invente pas d'événement, ni ne propose des activités non pertinentes.",
+    "Plusieurs évènements gratuits à Nancy sont présent dans la base de données parmis lesquels: - Exposition Présents - Visite de Nancy Thermal : un projet né il y a 117 ans - Escape Game "Panique en cabine". Les dates, les conditions d'accès, la gratuité, ainsi que les informations complémentaires utiles pour chaque évènement sont clairement indiqués si disponibles.",
+    "Aucun évènement correspondant à cette recherche n'est disponible dans la base. Si aucun évènement, la réponse l'indique clairement sans proposer d'évènements hors du contexte demandé.",
+    "Les évènements de type "atelier" à Charleville-Mézières présents dans la base sont - "Nuée" (spectacle et atelier autour de la marionnette) - Les Quiquoi et le chien moche dont personne ne veut. Pour chaque atelier, la réponse précise les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
+    "Les événements adaptés aux seniors à Colmar retrouvés dans la base de données - "4026 Des jouets éternels ?" - Visite guidée de la Comédie de Colmar - Visite du bâtiment administratif du XIXe siècle. La réponse indique pour chacun des évènements les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
+    "Plusieurs expositions disponibles à Strasbourg le mois prochain dan la base de données, dont: - Visite libre de l’exposition « Un Voyage à Strasbourg » - Archifoto 2026 - Visite guidée de l'exposition "Un voyage à Strasbourg". Pour chacune des expositions, les dates, les liens, les conditions sont précisées",
+    "Aucun événement correspondant n'est disponible dans la base. La réponse l'indiquer clairement sans proposer d'événements situés dans une autre ville.",
+    "Aucun cours de plongée sous-marine n'a été trouvé à Reims dans la base de données. La réponse n'invente aucun événement, ni ne propose d'autres activités."
 ]
 
 # Génération des réponses IA + contextes
