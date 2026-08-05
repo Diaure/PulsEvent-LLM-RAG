@@ -21,7 +21,7 @@ L'extraction a été limitée:
 - aux évènements compris entre le 1er janvier 2025 et le 31 décembre 2026
 
 ### Principes
-L'API OpenDataSoft impose une limite: `offset + limit <= 10000`.
+L'API Open Agenda impose une limite: `offset + limit <= 10000`.
 
 Dans ce contexte, il est impossible de récupérer l'ensemble des évènements sur une seule période de deux ans avec une seule requête. Pour contourner cette limitation, nous avons découper la période d'extraction en plusieurs intervalles chronologiques:
 

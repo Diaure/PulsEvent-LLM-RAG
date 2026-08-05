@@ -61,6 +61,7 @@ for idx, row in ge_events_df.iterrows():
             "age_minimum": row["age_min"],
             "age_maximum": row["age_max"],
             "canonicalurl": row["canonicalurl"],
+            "keywords_fr": row["keywords_fr"],
             "chunk": chunk})
 
 print("Nombre total de chunk:", len(chunks))

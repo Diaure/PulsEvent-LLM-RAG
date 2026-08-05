@@ -16,6 +16,7 @@ print("Taille des vecteurs :", vectors.shape)
 
 # Initialisation de l'index Faiss
 dimension = vectors.shape[1]
+# index = faiss.IndexFlatL2(dimension)
 
 if os.getenv("CI") != "true":
     index = faiss.read_index("./faiss_index/faiss.idx")
@@ -45,6 +46,7 @@ metadata = [
         "age_minimum": e["age_minimum"],
         "age_maximum": e["age_maximum"],
         "canonicalurl": e["canonicalurl"],
+        "keywords_fr": e["keywords_fr"],
         "chunk": e["chunk"]}
     for e in data]
 

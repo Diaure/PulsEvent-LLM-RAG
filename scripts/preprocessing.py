@@ -98,7 +98,7 @@ for to, count in tos_compte.most_common():
 # age min/max, date_rage-date complete et heure, )
 champs_a_garder = [
     "uid", "canonicalurl",
-    "title_fr", "description_fr", "longdescription_fr",
+    "title_fr", "description_fr", "longdescription_fr", "keywords_fr",
     "conditions_fr", "timings",
     "daterange_fr", "firstdate_begin", "lastdate_end",
     "location_name", "location_address", "location_postalcode", "location_city", "location_department", "location_region",
@@ -151,7 +151,8 @@ def contruire_texte_rag(row):
         f"Date: {row['daterange_fr']}",
         f"Firstdate_debut: {row['firstdate_begin']}",
         f"Lastdate_fin: {row['lastdate_end']}",
-        f"Lien: {row['canonicalurl']}"
+        f"Lien: {row['canonicalurl']}",
+        f"Mots_clés: {row['keywords_fr']}"
         # f"Event_en_cours: {row['event_actif']}"
     ]
     return "\n".join([p for p in parts if p])

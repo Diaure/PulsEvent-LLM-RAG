@@ -30,9 +30,7 @@ def embed_batch(batch):
     texts = [c["chunk"] for c in batch]
     while True:
         try:
-            response = client.embeddings.create(
-                model=model,
-                inputs=texts)
+            response = client.embeddings.create(model = model, inputs = texts)
             return [item.embedding for item in response.data]
         except Exception as e:
             if "429" in str(e):
@@ -61,6 +59,7 @@ for i in tqdm.tqdm(range(0, len(chunks), BATCH_SIZE), desc="Vectorisation Mistra
             "age_minimum": c["age_minimum"],
             "age_maximum": c["age_maximum"],
             "canonicalurl": c["canonicalurl"],
+            "keywords_fr": c["keywords_fr"],
             "chunk": c["chunk"],
             "embedding": emb})
     

@@ -200,13 +200,6 @@ def extraire_intervalle_temporel(question: str):
         except:
             pass
 
-    # le 12 août 2026
-    # try:
-    #     d = dateutil.parser.parse(question, fuzzy=True)
-    #     return aware(d), aware(d)
-    # except:
-    #     pass
-
     # du 5 au 7 juillet
     m = re.search(r"du (\d{1,2}) au (\d{1,2}) ([a-zéû]+)", question)
     if m:
@@ -228,6 +221,7 @@ def extraire_intervalle_temporel(question: str):
 def event_is_in_interval(event, start, end):
     print("\n----------------")
     print(event["title"])
+    print(event.get("keywords_fr"))
     try:
         # Essayer timing_begin / timing_end
         debut_raw = event.get("timing_begin")
@@ -254,10 +248,57 @@ def event_is_in_interval(event, start, end):
         print("ERREUR :", e)
         return False
 
+# fonction permettant de rechercher par mots clés
+# type de mots-clés
+type_keywords = {
+    "atelier": [
+        "atelier", "créatif", "création", "initiation",
+        "fabrication", "cuisine", "maquette", "bricolage"],
+    "concert": [
+        "concert", "musique", "chorale", "orchestre", "récital"],
+    "exposition": [
+        "exposition", "vernissage", "musée", "galerie"],
+    "visite": [
+        "visite", "visite guidée", "patrimoine", "découverte"],
+    "spectacle": [
+        "spectacle", "théâtre", "danse", "marionnette", "cirque"]}
+
+def determiner_type_evenement(event):
+    textes = []
+
+    # keywords
+    keywords = event.get("keywords_fr")
+    if keywords is not None and str(keywords).lower() != "nan":
+        if isinstance(keywords, list):
+            textes.extend(keywords)
+        else:
+            textes.append(str(keywords))
+
+    # titre
+    textes.append(str(event.get("title_fr", "")))
+
+    texte = " ".join(textes).lower()
+
+    for categorie, mots in type_keywords.items():
+        if any(mot in texte for mot in mots):
+            return categorie
+    return None
+
+def extraire_type_evenement(question):
+    question = question.lower()
+    for categorie, mots in type_keywords.items():
+        if any(mot in question for mot in mots):
+            return categorie
+    return None
+
 
 # Recherche des évènements pertinents en fonction de l'actualité de l'évènement au moment de l'envoi du prompt
 def recherche_event_pertinent(query, k = 100, max_results = 20):
     index, metadata = load_faiss_index()
+
+    print("FAISS :", index.ntotal)
+    print("Metadata :", len(metadata))
+
     q_emb = embed_query(query) # transforme le prompt en numérique
     distances, indices = index.search(np.array(q_emb, dtype="float32").reshape(1, -1), k) # transforme la liste de floats en tableau numpy avec vecteurs et dimension
 
@@ -271,8 +312,9 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
     m = re.search(r"(\d+)\s*ans", query.lower())
     age_demande = int(m.group(1)) if m else None
 
-    # extraction mots-clés
-    # mots_cles = re.findall(r"[a-zA-Zéèêàùûôç]+", query.lower())
+    # filtre type évènement
+    type_evenement  = extraire_type_evenement(query)
+    print("type évènement:", type_evenement)
 
     results = []
     uid_vu = set()
@@ -281,24 +323,21 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
     nb_ville = 0
     nb_date = 0
     nb_age = 0
+    nb_event_type = 0
+
+    print(indices.shape)
+    print(indices[0][:20])
 
     for idx in indices[0]:
+        print(idx)
         event = metadata[idx]
-        
+
         print("\n---------------------")
         print("\nEvent:", event["title"])
 
         # éviter doublons
         if event["uid"] in uid_vu:
             print("REJET uid")
-            continue
-
-        # filtre actif
-        try:
-            date_fin = datetime.fromisoformat(event["lastdate_end"].replace("Z", "+00:00"))
-            if date_fin < datetime.now(date_fin.tzinfo):
-                continue
-        except:
             continue
 
         # filtre actif
@@ -326,7 +365,6 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
             # si l'événement ne possède pas d'information d'âge
             if age_min_event is None and age_max_event is None:
                 pass
-
             # si seul l'âge minimum est renseigné
             elif age_min_event is not None and age_demande < age_min_event:
                 continue
@@ -346,11 +384,22 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
                 continue
         nb_date += 1
         print("-> temporel OK")
+
+        # filtre type d'évènement
+        texte = (str(event.get("title", "")) + " " + str(event.get("keywords_fr", ""))).lower()
+        mots_recherches = type_keywords.get(type_evenement, [])
+
+        if mots_recherches:
+            if not any(mot in texte for mot in mots_recherches):
+                print("-> rejet type")
+                continue
+        print("-> type OK")
+        nb_event_type += 1
            
         uid_vu.add(event["uid"])
         results.append(event)
 
-        if len(results) == max_results:
+        if len(results) >= max_results:
             break
 
     print("\n========== DEBUG ==========")
@@ -360,6 +409,7 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
     print("Après filtre ville :", nb_ville)
     print("Après filtre âge :", nb_age)
     print("Après filtre temporel :", nb_date)
+    print("Après filtre type event :", nb_event_type)
     print("Résultats finaux :", len(results))
     print("===========================\n")
     return results
@@ -403,7 +453,6 @@ def build_context(results): # contruit un contexte complet qui fournit toutes le
             f"Titre: {r['title']}\n"
             f"Ville: {r['city']}\n"
             f"Lieu: {r.get('lieu', '')}\n"
-            # f"Adresse: {r.get('location_address', '')}\n"
             f"Conditions: {r.get('conditions', '')}\n"
             f"Age minimum: {r.get('age_minimum', '')}\n"
             f"Age maximum: {r.get('age_maximum', '')}\n"
@@ -417,21 +466,38 @@ def build_context(results): # contruit un contexte complet qui fournit toutes le
     return "\n".join(parts)
 
 # RAG
-def generate_answer(question):
-    event = recherche_event_pertinent(question, max_results = 10)
-    if len(event) == 0:
+# générer  une réponse à partir d'un contexte déjà construit
+def generate_answer_from_context(question, context):
+    if not context.strip():
         return "Je n'ai trouvé aucun événement correspondant à votre recherche."
     
-    context = build_context(event)
-
     chain = prompt | chatbot_llm
     response = chain.invoke(
         {
             "context": context,
             "question": question
         })
-
     return response.content
+
+
+def generate_answer(question):
+    event = recherche_event_pertinent(question, max_results = 10)
+
+    if len(event) == 0:
+        return {"answer": "Je n'ai trouvé aucun événement correspondant à votre recherche.", "events": [], "context": ""}
+    
+    context = build_context(event)
+    answer = generate_answer_from_context(question, context)
+
+    # chain = prompt | chatbot_llm
+    # response = chain.invoke(
+    #     {
+    #         "context": context,
+    #         "question": question
+    #     })
+
+    return {"answer": answer, "events": event, "context": context}
+
 
 # Classe pour API
 class PulsEventRAG:
@@ -526,6 +592,7 @@ class PulsEventRAG:
 
         for e in filtered:
             new_e = {c: e.get(c) for c in champs_a_garder}
+            new_e["type_evenement"] = determiner_type_evenement(new_e)
 
             # Statut actif
             last_date = e.get("lastdate_end")
@@ -556,7 +623,8 @@ class PulsEventRAG:
                     f"Date: {new_e['daterange_fr']}",
                     f"Firstdate_debut: {new_e['firstdate_begin']}",
                     f"Lastdate_fin: {new_e['lastdate_end']}",
-                    f"Lien: {new_e['canonicalurl']}"]
+                    f"Lien: {new_e['canonicalurl']}",
+                    f"Type_evenement: {new_e['type_evenement']}"]
             texte_rag = "\n".join([p for p in parts if p])
             new_e["texte_rag"] = texte_rag
 
@@ -611,6 +679,7 @@ class PulsEventRAG:
                     "age_minimum": e.get("age_min"),
                     "age_maximum": e.get("age_max"),
                     "canonicalurl": e.get("canonicalurl"),
+                    "type_evenement": e.get("type_evenement"),
                     "chunk": ch
                 })
 
@@ -645,7 +714,7 @@ class PulsEventRAG:
                 except Exception as e:
                     print(repr(e))
                     if "429" in str(e):
-                        print("⏳ Rate limit atteint → pause 5 secondes…")
+                        print("Rate limit atteint <> pause 5 secondes…")
                         time.sleep(5)
                         continue
                     # else:
@@ -743,5 +812,5 @@ class PulsEventRAG:
         return generate_answer(question)
 
 # Tests
-if __name__ == "__main__":
-    print(generate_answer("Je cherche un cours de plongée sous-marine à Reims."))
+# if __name__ == "__main__":
+#     print(generate_answer("Je cherche une exposition le mois prochain à Strasbourg."))
