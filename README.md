@@ -14,7 +14,7 @@ API utilisée :
 
 ### Objectif
 
-Afin d'alimenter le système RAG, les événements ont été extraits depuis le jeu de données **Événements publics OpenAgenda** disponible sur l'API ***OpenDataSoft***.
+Afin d'alimenter le système RAG, les événements ont été extraits depuis le jeu de données **Événements publics Open Agenda** disponible sur l'API ***Open Agenda***.
 
 L'extraction a été limitée:
 - à la région **Grand Est**
