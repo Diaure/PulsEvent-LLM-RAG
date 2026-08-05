@@ -198,7 +198,7 @@ Les réponses générées ont été exportées dans un fichier CSV afin de pouvo
 
 Les principaux indicateurs étudiés sont:
 
-- **F**aithfulness**: cohérence entre la réponse et le contexte récupéré ;
+- **Faithfulness**: cohérence entre la réponse et le contexte récupéré ;
 - **Answer Relevancy**: pertinence de la réponse apportée ;
 - **Context Precision**: qualité des documents retrouvés ;
 - **Context Recall**: capacité à récupérer les informations attendues.
@@ -272,53 +272,3 @@ Après avoir lancé l'API FastAPI, lancer l'interface Streamlit:
 
 ```bash
 streamlit scripts/run rag_streamlit.py
-
-
-
-
-
-
-Dans mon fichier de tests des filtres, je vérifie 3 choses.
-- D’abord, que le statut event_actif est correct : un événement futur est actif, un événement passé ou invalide est inactif.
-- Ensuite, je teste event_is_in_interval, qui vérifie si un événement tombe dans la période demandée, y compris les cas fallback et les dates invalides.
-- Enfin, je teste aussi extraire_ville, qui doit détecter correctement la ville dans la question.
-Tous ces tests sont regroupés dans un seul fichier, sans ajouter de nouvelles fonctions dans mon code de production
-
-Le test fonctionnel vérifie le comportement global du système RAG, il teste un scénarion complet. Il va donc tester que:
-1. La question est correctement analysée
-- ville extraite
-- âge extrait
-- intervalle temporel extrait
-
-2. Les filtres fonctionnent
-- ville
-- âge
-- date
-- event_actif
-
-3. La recherche FAISS renvoie des résultats
-- index chargé
-- embeddings chargés
-- recherche effectuée
-
-4. Le système renvoie une réponse cohérente
-- liste d’événements
-- métadonnées correctes
-- chunk correct
-
-Les tests fonctionnels vérifient que mon RAG fonctionne de bout en bout.
-D’abord, j’ai un test qui vérifie que la question est bien analysée : la ville, l’âge et la date sont correctement extraits.
-Ensuite, j’ai un test qui vérifie que les filtres fonctionnent : l’événement doit correspondre à la ville, à l’âge et à la période demandée.
-Enfin, j’ai un test qui vérifie le pipeline complet : quand je pose une vraie question, le système doit renvoyer une liste d’événements cohérents, avec leurs métadonnées.
-Ces tests garantissent que mon RAG fonctionne réellement dans des scénarios proches de l’usage final.
-
-Mes tests fonctionnels ne testent pas des fonctions isolées, mais des scénarios complets.
-D’abord, je vérifie que la ville et la période sont correctement extraites de la question.
-Ensuite, je vérifie qu’un événement simulé correspond bien à la ville, à l’âge et à la période demandée.
-Enfin, je teste le pipeline complet via rechercher_evenements : pour une vraie question, le système doit renvoyer une liste d’événements avec leurs métadonnées.
-Je n’ai pas de fonction extraire_age, donc je ne l’invente pas : l’âge est testé au niveau du comportement global.
-
-
-J’ai mis en place un workflow GitHub Actions simple et efficace.
-À chaque push ou pull request, GitHub installe Python, installe mes dépendances, puis exécute automatiquement tous mes tests unitaires et fonctionnels.
-Cela garantit que mon RAG reste stable et que chaque modification du code est validée par une suite de tests complète.
