@@ -778,23 +778,25 @@ class PulsEventRAG:
         print("Préprocessing...", flush=True)
         t1 = time.perf_counter()
         clean = self._preprocess(events)
-        print(len(clean), flush=True)
+        print(f"Taille data traité: {len(clean)}", flush=True)
         print(f"Préprocessing: {time.perf_counter() - t1:.1f} s")
 
         print("Chunking...", flush=True)
         t2 = time.perf_counter()
         chunks, metadata = self._chunking(clean)
-        print(len(chunks), flush=True)
+        print(f"Taille chunks: {len(chunks)}", flush=True)
         print(f"Chunking : {time.perf_counter() - t2:.1f} s")
 
         print("Embedding...", flush=True)
         t3 = time.perf_counter()
         vectors = self._embeding(chunks)
+        print(f"Taille embeddings: {len(vectors)}", flush=True)
         print(f"Embeddings : {time.perf_counter() - t3:.1f} s")
 
         print("FAISS...", flush=True)
         t4 = time.perf_counter()
         index = self._faiss_build(vectors)
+        print(f"Taille index: {len(index)}", flush=True)
         print(f"Embeddings : {time.perf_counter() - t4:.1f} s")
 
         print("Saving...", flush=True)
