@@ -8,11 +8,14 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+# RUN pip install --upgrade pip && \
+#     pip install -r requirements.txt
 
 # Copie des fichers nécessaires
-COPY ./app/
+COPY api/ ./api/
+COPY scripts/ ./scripts/
+COPY data/ ./data/
+COPY faiss_index/ ./faiss_index/
 
 EXPOSE 7860
 
