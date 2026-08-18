@@ -3,10 +3,24 @@ import json
 import requests
 
 # Fonction pour appeler l'API via streamlit
+# def appel_api_rest(question: str) -> str:
+#     url = "http://localhost:8501/ask"  # adapte si besoin
+#     payload = {"question": question}
+#     r = requests.post(url, json=payload)
+#     data = r.json()
+#     return data["answer"]
+
 def appel_api_rest(question: str) -> str:
-    url = "http://localhost:8000/ask"  # adapte si besoin
+    url = "http://localhost:7860/ask"
     payload = {"question": question}
+
     r = requests.post(url, json=payload)
+
+    print("STATUS API :", r.status_code)
+    print("RESPONSE API :", r.text)
+
+    r.raise_for_status()
+
     data = r.json()
     return data["answer"]
 
@@ -127,17 +141,38 @@ if prompt := st.chat_input("Comment puis-je vous aider ?"):
         placeholder.markdown('<div class="chat-bubble-assistant">En train de réfléchir...</div>', unsafe_allow_html=True)
 
         # Appel à l'API
+        # try:
+        #     response = appel_api_rest(prompt)
+        #     print("Réponse API :", response)
+        # except Exception as e:
+        #     print("ERREUR API :", e)
+
+        # # Affichage final
+        # response = appel_api_rest(prompt)
+        # if afficher_evenements(response):
+        #     placeholder.empty()
+        # else:
+        #     placeholder.markdown(f'<div class="chat-bubble-assistant">{response}</div>', unsafe_allow_html=True)
+
         try:
             response = appel_api_rest(prompt)
             print("Réponse API :", response)
+
+            if afficher_evenements(response):
+                placeholder.empty()
+            else:
+                placeholder.markdown(
+                    f'<div class="chat-bubble-assistant">{response}</div>',
+                    unsafe_allow_html=True
+                )
+
         except Exception as e:
             print("ERREUR API :", e)
-
-        # Affichage final
-        if afficher_evenements(response):
-            placeholder.empty()
-        else:
-            placeholder.markdown(f'<div class="chat-bubble-assistant">{response}</div>', unsafe_allow_html=True)
+            placeholder.markdown(
+                f'<div class="chat-bubble-assistant">Erreur lors de la communication avec l API : {e}</div>',
+                unsafe_allow_html=True
+            )
+            response = f"Erreur API : {e}"
 
     # Ajout à l'historique
     st.session_state.messages.append({"role": "assistant", "content": response})

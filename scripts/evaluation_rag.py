@@ -4,20 +4,23 @@ from datasets import Dataset
 from dotenv import load_dotenv
 
 from ragas import evaluate
-from ragas.metrics import (
+from ragas.metrics.collections import (
     faithfulness,
     answer_relevancy,
     context_precision,
     context_recall,
 )
 
-from langchain_mistralai import ChatMistralAI, MistralAIEmbeddings
+from langchain_mistralai import MistralAIEmbeddings
+from mistralai.client import Mistral
+from ragas.llms import llm_factory
 from chatbot_rag import generate_answer_from_context, recherche_event_pertinent, build_context
 
 # Configuration
 load_dotenv()
 api_key = os.getenv("PULSEVENT_MISTRAL_KEY")
-ragas_llm = ChatMistralAI(model="mistral-small-latest", api_key=api_key)
+mistral_client = Mistral(api_key=api_key)
+ragas_llm = llm_factory(model="mistral-small-latest", provider="mistral", api_key=mistral_client)
 ragas_embeddings = MistralAIEmbeddings(model="mistral-embed", api_key=api_key)
 
 
@@ -102,6 +105,14 @@ metrics_to_evaluate = [
     context_precision,
     context_recall,
 ]
+
+
+# tEST ET V2RIF
+print("LLM:", ragas_llm)
+print("EMBEDDINGS:", ragas_embeddings)
+print("QUESTIONS:", len(questions_test))
+print("ANSWERS:", len(answers))
+print("CONTEXTS:", len(contexts))
 
 results = evaluate(
     dataset=evaluation_dataset,

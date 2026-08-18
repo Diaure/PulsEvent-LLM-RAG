@@ -1,4 +1,6 @@
 .env
+.venv/
+.streamlit-venv/
 data/embeddings.pkl
 faiss_index/*.idx
 faiss_index/*.pkl
