@@ -121,7 +121,7 @@ def extraire_ville(question):
 
         pattern = r"\b" + re.escape(ville_normalisee) + r"\b"
         if re.search(pattern, q):
-            return {"ville": ville, "connue": True}
+            return ville
 
     match = re.search(
         r"\b(?:à|a|dans)\s+([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ-]*(?:[\s-][A-Za-zÀ-ÿ][A-Za-zÀ-ÿ-]*)*)",
@@ -129,9 +129,9 @@ def extraire_ville(question):
         re.IGNORECASE)
     
     if match:
-        ville_detectee = match.group(1).strip()
+        ville_detectee = normalize_city(match.group(1).strip())
         ville_detectee = normalize_city(ville_detectee)
-        return {"ville": ville_detectee, "connue": False}
+        return ville_detectee
 
     # Si aucune ville connue dans la quesion
     return None
@@ -323,8 +323,7 @@ def extraire_type_evenement(question):
                 "statut": "inconnu"}
         
     # Si aucun type précis
-    return None
-
+    return {"type": None, "statut": "aucun"}
 
 # Recherche des évènements pertinents en fonction de l'actualité de l'évènement au moment de l'envoi du prompt
 def recherche_event_pertinent(query, k = 100, max_results = 20):
@@ -338,23 +337,21 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
 
     intervalle = extraire_intervalle_temporel(query)
 
-    ville_info = extraire_ville(query)
-    if ville_info is None:
-        ville = None
-        ville_connue = True
-    else:
-        ville = ville_info["ville"]
-        ville_connue = ville_info["connue"]
-
+    ville = extraire_ville(query)
     print("VILLE EXTRAITE :", ville)
-    print("VILLE CONNUE :", ville_connue)
     print("INTERVALLE :", intervalle)
 
-    if ville is not None and not ville_connue:
-        print(
-            f"VILLE '{ville}' NON PRÉSENTE DANS LA BASE "
-            "-> aucun événement")
-        return []
+    # Vérifier si la ville extraite existe dans les données
+    if ville is not None:
+        villes_disponibles = {normalize_city(event.get("city"))
+            for event in metadata
+            if normalize_city(event.get("city")) is not None}
+
+        if ville not in villes_disponibles:
+            print(
+                f"VILLE '{ville}' NON PRÉSENTE DANS LA BASE "
+                "-> aucun événement")
+            return []
 
     # extraction âge
     m = re.search(r"(\d+)\s*ans", query.lower())
