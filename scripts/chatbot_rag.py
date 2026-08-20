@@ -106,18 +106,34 @@ def extraire_ville(question):
     q = unicodedata.normalize("NFD", question.lower())
     q = ''.join(c for c in q if unicodedata.category(c) != "Mn")
 
-    # Extraire toutes les villes valides
-    villes_disponibles = list(set(
-        normalize_city(e.get("city"))
-        for e in metadata
-        if normalize_city(e.get("city")) is not None))
+    # Récupérer les villes de la BDD
+    villes_disponibles = set()
+    for event in metadata:
+        ville = normalize_city(event.get("city"))
 
-    # Chercher une ville dans la question
-    villes_disponibles.sort(key=len, reverse=True)
-    for ville in villes_disponibles:
-        pattern = r"\b" + re.escape(ville) + r"\b"
+        if ville is not None:
+            villes_disponibles.add(ville)
+
+    # Chercher une ville connue dans la question
+    for ville in sorted(villes_disponibles, key=len, reverse=True):
+        ville_normalisee = unicodedata.normalize("NFD", ville.lower())
+        ville_normalisee = ''.join(c for c in ville_normalisee if unicodedata.category(c) != "Mn")
+
+        pattern = r"\b" + re.escape(ville_normalisee) + r"\b"
         if re.search(pattern, q):
-            return ville
+            return {"ville": ville, "connue": True}
+
+    match = re.search(
+        r"\b(?:à|a|dans)\s+([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ-]*(?:[\s-][A-Za-zÀ-ÿ][A-Za-zÀ-ÿ-]*)*)",
+        question,
+        re.IGNORECASE)
+    
+    if match:
+        ville_detectee = match.group(1).strip()
+        ville_detectee = normalize_city(ville_detectee)
+        return {"ville": ville_detectee, "connue": False}
+
+    # Si aucune ville connue dans la quesion
     return None
 
 
@@ -286,9 +302,27 @@ def determiner_type_evenement(event):
 
 def extraire_type_evenement(question):
     question = question.lower()
+
+    # Type connu dans la base
     for categorie, mots in type_keywords.items():
-        if any(mot in question for mot in mots):
-            return categorie
+        for mot in mots:
+            if re.search(r"\b" + re.escape(mot) + r"\b", question):
+                return {
+                    "type": categorie,
+                    "statut": "connu"}
+
+    # Déterminer si la question contient une demande d'activité/type spécifique
+    motifs_type_demande = [r"\bcours\s+de\s+(.+)", r"\bcours\s+d['’](.+)", 
+                           r"\bformation\s+(?:en|de|à|a)\s+(.+)", r"\bstage\s+(?:en|de|à|a)\s+(.+)",
+                            r"\bséance\s+(?:de|d['’])\s*(.+)", r"\binitiation\s+(?:à|a)\s+(.+)",]
+    for motif in motifs_type_demande:
+        match = re.search(motif, question)
+        if match:
+            return {
+                "type": match.group(0).strip(),
+                "statut": "inconnu"}
+        
+    # Si aucun type précis
     return None
 
 
@@ -303,18 +337,42 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
     distances, indices = index.search(np.array(q_emb, dtype="float32").reshape(1, -1), k) # transforme la liste de floats en tableau numpy avec vecteurs et dimension
 
     intervalle = extraire_intervalle_temporel(query)
-    ville = extraire_ville(query)
+
+    ville_info = extraire_ville(query)
+    if ville_info is None:
+        ville = None
+        ville_connue = True
+    else:
+        ville = ville_info["ville"]
+        ville_connue = ville_info["connue"]
 
     print("VILLE EXTRAITE :", ville)
+    print("VILLE CONNUE :", ville_connue)
     print("INTERVALLE :", intervalle)
+
+    if ville is not None and not ville_connue:
+        print(
+            f"VILLE '{ville}' NON PRÉSENTE DANS LA BASE "
+            "-> aucun événement")
+        return []
 
     # extraction âge
     m = re.search(r"(\d+)\s*ans", query.lower())
     age_demande = int(m.group(1)) if m else None
 
     # filtre type évènement
-    type_evenement  = extraire_type_evenement(query)
-    print("type évènement:", type_evenement)
+    type_info = extraire_type_evenement(query)
+    type_evenement = type_info["type"]
+    type_statut = type_info["statut"]
+
+    print("TYPE ÉVÈNEMENT :", type_evenement)
+    print("STATUT TYPE :", type_statut)
+
+    if type_statut == "inconnu":
+        print(
+            f"Type/domaine demandé non pris en charge : "
+            f"{type_evenement}")
+        return []
 
     results = []
     uid_vu = set()
@@ -386,13 +444,25 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
         print("-> temporel OK")
 
         # filtre type d'évènement
-        texte = (str(event.get("title", "")) + " " + str(event.get("keywords_fr", ""))).lower()
-        mots_recherches = type_keywords.get(type_evenement, [])
+        # texte = (str(event.get("title", "")) + " " + str(event.get("keywords_fr", ""))).lower()
+        # mots_recherches = type_keywords.get(type_evenement, [])
 
-        if mots_recherches:
+        # if mots_recherches:
+        #     if not any(mot in texte for mot in mots_recherches):
+        #         print("-> rejet type")
+        #         continue
+
+        if type_statut == "connu":
+            texte = (
+                str(event.get("title_fr", "")) +
+                " " +
+                str(event.get("keywords_fr", ""))).lower()
+
+            mots_recherches = type_keywords[type_evenement]
             if not any(mot in texte for mot in mots_recherches):
                 print("-> rejet type")
                 continue
+
         print("-> type OK")
         nb_event_type += 1
            
@@ -814,5 +884,5 @@ class PulsEventRAG:
         return generate_answer(question)
 
 # Tests
-# if __name__ == "__main__":
-#     print(generate_answer("Je cherche une exposition le mois prochain à Strasbourg."))
+if __name__ == "__main__":
+    print(generate_answer("Je cherche un cours de plongée sous-marine à Reims."))
