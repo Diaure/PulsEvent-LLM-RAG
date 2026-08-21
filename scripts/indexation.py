@@ -47,6 +47,8 @@ metadata = [
         "age_maximum": e["age_maximum"],
         "canonicalurl": e["canonicalurl"],
         "keywords_fr": e["keywords_fr"],
+        "description_fr": e["description_fr"],
+        "longdescription_fr": e["longdescription_fr"],
         "chunk": e["chunk"]}
     for e in data]
 

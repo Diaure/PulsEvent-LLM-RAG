@@ -284,6 +284,7 @@ def determiner_type_evenement(event):
 
     # keywords_fr
     keywords = event.get("keywords_fr")
+
     if keywords is not None and str(keywords).lower() != "nan":
         if isinstance(keywords, list):
             textes.extend(str(k) for k in keywords)
@@ -291,13 +292,13 @@ def determiner_type_evenement(event):
             textes.append(str(keywords))
 
     # titre
-    textes.append(str(event.get("title_fr", "")))
+    textes.append(str(event.get("title", "")))
 
     # description courte
-    textes.append(str(event.get("description_fr", "")))
+    textes.append(str(event.get("description", "")))
 
     # description longue
-    textes.append(str(event.get("longdescription_fr", "")))
+    textes.append(str(event.get("longdescription", "")))
 
     texte = " ".join(textes).lower()
 
@@ -372,7 +373,7 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
     m = re.search(r"(\d+)\s*ans", query.lower())
     age_demande = int(m.group(1)) if m else None
 
-    # ype évènement
+    # Type évènement
     type_info = extraire_type_evenement(query)
 
     type_evenement = type_info["type"]
@@ -459,13 +460,26 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
 
         # filtre type d'évènement
         if type_evenement is not None:
+            print("\n========== DEBUG TYPE ==========")
+            print("TYPE DEMANDÉ :", repr(type_evenement))
 
             type_event = determiner_type_evenement(event)
+
+            print("UID :", event.get("uid"))
+            print("TITLE :", repr(event.get("title")))
+            print("TITLE_FR :", repr(event.get("title_fr")))
+            print("DESCRIPTION :", repr(event.get("description")))
+            print("DESCRIPTION_FR :", repr(event.get("description_fr")))
+            print("LONGDESCRIPTION :", repr(event.get("longdescription")))
+            print("LONGDESCRIPTION_FR :", repr(event.get("longdescription_fr")))
+            print("KEYWORDS_FR :", repr(event.get("keywords_fr")))
+            print("TYPE DÉTECTÉ :", repr(type_event))
+            print("================================")
 
             print("Type demandé :", type_evenement)
             print("Type détecté événement :", type_event)
 
-            if type_event != type_evenement:
+            if type_event is None or type_evenement not in type_event:
                 print("-> rejet type")
                 continue
 
@@ -891,4 +905,4 @@ class PulsEventRAG:
 
 # Tests
 if __name__ == "__main__":
-    print(generate_answer("Y a-t-il un concert à Strasbourg ?"))
+    print(generate_answer("Quels événements sont prévus ce week-end à Metz ?"))
