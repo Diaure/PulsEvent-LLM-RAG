@@ -49,7 +49,10 @@ mistral_client = AsyncOpenAI(
 
 ragas_llm = llm_factory(
     "mistral-small-latest",
-    client=mistral_client,)
+    client=mistral_client,
+    max_tokens=4096,
+    temperature=0.01,
+    top_p=0.1,)
 
 # ragas_llm = LangchainLLMWrapper(
 #     ChatMistralAI(
@@ -73,29 +76,29 @@ ragas_embeddings = HuggingFaceEmbeddings(
 
 # Questions tests & réponses attendues
 questions_test = [
-    "Y a-t-il un concert à Strasbourg ?",
-    "Je cherche un atelier pour un enfant de 8 ans à Reims.",
-    "Quels événements sont prévus ce week-end à Metz ?",
-    "Y a-t-il des événements gratuits à Nancy ?",
-    "Que faire en famille à Mulhouse ce week-end ?",
-    "Je cherche des ateliers à Charleville-Mézières.",
-    "Quels événements sont adaptés aux seniors à Colmar ?",
-    "Je cherche une exposition le mois prochain à Strasbourg.",
-    "Je cherche un événement culturel à Tokyo.",
-    "Je cherche un cours de plongée sous-marine à Reims."
+    "Y a-t-il un concert à Strasbourg ?"
+    # "Je cherche un atelier pour un enfant de 8 ans à Reims.",
+    # "Quels événements sont prévus ce week-end à Metz ?",
+    # "Y a-t-il des événements gratuits à Nancy ?",
+    # "Que faire en famille à Mulhouse ce week-end ?",
+    # "Je cherche des ateliers à Charleville-Mézières.",
+    # "Quels événements sont adaptés aux seniors à Colmar ?",
+    # "Je cherche une exposition le mois prochain à Strasbourg.",
+    # "Je cherche un événement culturel à Tokyo.",
+    # "Je cherche un cours de plongée sous-marine à Reims."
 ]
 
 ground_truths = [
-    "Plusieurs concerts sont disponibles à Strasbourg. Parmi les plus pertinents figurent: - Concert de musique classique à Strasbourg – Ensemble Musicâme France - Vêpres italiennes des XVIème et XVIIème siècles par l'Ensemble Triosa. Pour chacun des évènements, les dates, les conditions de participation et les informations pratiques sont indiquées lorsqu'elles sont disponibles",
-    "Voici des ateliers adaptés à un enfant de 8 ans à Reims: - Atelier 'bacs de fouilles' pour les enfants - Ateliers culinaires pour enfants à la Belle Enchantée - Les coulisses de la création. Pour chacun, les dates, les conditions de participation, les tranches d'âge concernées, et les liens des événements lorsque disponibles sont clairement mentionnés.",
-    "Aucun événement correspondant à cette recherche n'est présent dans la base de données. La réponse n'invente pas d'événement, ni ne propose des activités non pertinentes.",
-    "Plusieurs évènements gratuits à Nancy sont présent dans la base de données parmis lesquels: - Exposition Présents - Visite de Nancy Thermal : un projet né il y a 117 ans - Escape Game 'Panique en cabine'. Les dates, les conditions d'accès, la gratuité, ainsi que les informations complémentaires utiles pour chaque évènement sont clairement indiqués si disponibles.",
-    "Aucun évènement correspondant à cette recherche n'est disponible dans la base. Si aucun évènement, la réponse l'indique clairement sans proposer d'évènements hors du contexte demandé.",
-    "Les évènements de type 'atelier'' à Charleville-Mézières présents dans la base sont - 'Nuée' (spectacle et atelier autour de la marionnette) - Les Quiquoi et le chien moche dont personne ne veut. Pour chaque atelier, la réponse précise les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
-    "Les événements adaptés aux seniors à Colmar retrouvés dans la base de données - '4026 Des jouets éternels ?' - Visite guidée de la Comédie de Colmar - Visite du bâtiment administratif du XIXe siècle. La réponse indique pour chacun des évènements les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
-    "Plusieurs expositions disponibles à Strasbourg le mois prochain dan la base de données, dont: - Visite libre de l’exposition « Un Voyage à Strasbourg » - Archifoto 2026 - Visite guidée de l'exposition 'Un voyage à Strasbourg'. Pour chacune des expositions, les dates, les liens, les conditions sont précisées",
-    "Aucun événement correspondant n'est disponible dans la base. La réponse l'indiquer clairement sans proposer d'événements situés dans une autre ville.",
-    "Aucun cours de plongée sous-marine n'a été trouvé à Reims dans la base de données. La réponse n'invente aucun événement, ni ne propose d'autres activités."
+    "Plusieurs concerts sont disponibles à Strasbourg. Parmi les plus pertinents figurent: - Concert de musique classique à Strasbourg – Ensemble Musicâme France - Vêpres italiennes des XVIème et XVIIème siècles par l'Ensemble Triosa. Pour chacun des évènements, les dates, les conditions de participation et les informations pratiques sont indiquées lorsqu'elles sont disponibles"
+    # "Voici des ateliers adaptés à un enfant de 8 ans à Reims: - Atelier 'bacs de fouilles' pour les enfants - Ateliers culinaires pour enfants à la Belle Enchantée - Les coulisses de la création. Pour chacun, les dates, les conditions de participation, les tranches d'âge concernées, et les liens des événements lorsque disponibles sont clairement mentionnés.",
+    # "Aucun événement correspondant à cette recherche n'est présent dans la base de données. La réponse n'invente pas d'événement, ni ne propose des activités non pertinentes.",
+    # "Plusieurs évènements gratuits à Nancy sont présent dans la base de données parmis lesquels: - Exposition Présents - Visite de Nancy Thermal : un projet né il y a 117 ans - Escape Game 'Panique en cabine'. Les dates, les conditions d'accès, la gratuité, ainsi que les informations complémentaires utiles pour chaque évènement sont clairement indiqués si disponibles.",
+    # "Aucun évènement correspondant à cette recherche n'est disponible dans la base. Si aucun évènement, la réponse l'indique clairement sans proposer d'évènements hors du contexte demandé.",
+    # "Les évènements de type 'atelier'' à Charleville-Mézières présents dans la base sont - 'Nuée' (spectacle et atelier autour de la marionnette) - Les Quiquoi et le chien moche dont personne ne veut. Pour chaque atelier, la réponse précise les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
+    # "Les événements adaptés aux seniors à Colmar retrouvés dans la base de données - '4026 Des jouets éternels ?' - Visite guidée de la Comédie de Colmar - Visite du bâtiment administratif du XIXe siècle. La réponse indique pour chacun des évènements les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
+    # "Plusieurs expositions disponibles à Strasbourg le mois prochain dan la base de données, dont: - Visite libre de l’exposition « Un Voyage à Strasbourg » - Archifoto 2026 - Visite guidée de l'exposition 'Un voyage à Strasbourg'. Pour chacune des expositions, les dates, les liens, les conditions sont précisées",
+    # "Aucun événement correspondant n'est disponible dans la base. La réponse l'indiquer clairement sans proposer d'événements situés dans une autre ville.",
+    # "Aucun cours de plongée sous-marine n'a été trouvé à Reims dans la base de données. La réponse n'invente aucun événement, ni ne propose d'autres activités."
 ]
 
 
@@ -172,69 +175,55 @@ print("CONTEXTS:", len(contexts))
 
 
 async def run_evaluation():
-
     results = []
-
     for i, question in enumerate(questions_test):
-
         print(f"\n===== QUESTION {i + 1}/{len(questions_test)} =====")
 
         answer = answers[i]
         retrieved_contexts = contexts[i]
         reference = ground_truths[i]
 
-        row = {
-            "question": question,
-            "answer": answer,
-            "reference": reference,
-        }
+        row = {"question": question, "answer": answer, "reference": reference,}
 
         result = await metrics_to_evaluate["faithfulness"].ascore(
             user_input=question,
             response=answer,
-            retrieved_contexts=retrieved_contexts,
-        )
+            retrieved_contexts=retrieved_contexts,)
         row["faithfulness"] = result.value
+        print("Faithfulness result:", result)
+        print("Faithfulness value:", result.value)
+        print("Faithfulness reason:", result.reason)
 
         result = await metrics_to_evaluate["answer_relevancy"].ascore(
             user_input=question,
-            response=answer,
-        )
+            response=answer,)
         row["answer_relevancy"] = result.value
+        print("Answer relevancy result:", result)
+        print("Answer relevancy value:", result.value)
+        print("Answer relevancy reason:", result.reason)
 
         result = await metrics_to_evaluate["context_precision"].ascore(
             user_input=question,
-            response=answer,
+            # response=answer,
             retrieved_contexts=retrieved_contexts,
-            reference=reference,
-        )
+            reference=reference,)
         row["context_precision"] = result.value
 
         result = await metrics_to_evaluate["context_recall"].ascore(
             user_input=question,
-            response=answer,
+            # response=answer,
             retrieved_contexts=retrieved_contexts,
-            reference=reference,
-        )
+            reference=reference,)
         row["context_recall"] = result.value
 
         results.append(row)
 
-        print(
-            f"Faithfulness      : {row['faithfulness']}"
-        )
-        print(
-            f"Answer relevancy  : {row['answer_relevancy']}"
-        )
-        print(
-            f"Context precision : {row['context_precision']}"
-        )
-        print(
-            f"Context recall    : {row['context_recall']}"
-        )
+        print(f"Faithfulness: {row['faithfulness']}")
+        print(f"Answer relevancy: {row['answer_relevancy']}")
+        print(f"Context precision : {row['context_precision']}")
+        print(f"Context recall    : {row['context_recall']}")
 
     return results
-
 
 results = asyncio.run(run_evaluation())
 

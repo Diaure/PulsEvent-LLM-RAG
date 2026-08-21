@@ -282,23 +282,38 @@ type_keywords = {
 def determiner_type_evenement(event):
     textes = []
 
-    # keywords
+    # keywords_fr
     keywords = event.get("keywords_fr")
     if keywords is not None and str(keywords).lower() != "nan":
         if isinstance(keywords, list):
-            textes.extend(keywords)
+            textes.extend(str(k) for k in keywords)
         else:
             textes.append(str(keywords))
 
     # titre
     textes.append(str(event.get("title_fr", "")))
 
+    # description courte
+    textes.append(str(event.get("description_fr", "")))
+
+    # description longue
+    textes.append(str(event.get("longdescription_fr", "")))
+
     texte = " ".join(textes).lower()
 
+    types_detectes = []
+
     for categorie, mots in type_keywords.items():
-        if any(mot in texte for mot in mots):
-            return categorie
-    return None
+        if any(
+            re.search(
+                r"\b" + re.escape(mot.lower()) + r"\b",
+                texte
+            )
+            for mot in mots
+        ):
+            types_detectes.append(categorie)
+
+    return types_detectes if types_detectes else None
 
 def extraire_type_evenement(question):
     question = question.lower()
@@ -314,7 +329,7 @@ def extraire_type_evenement(question):
     # Déterminer si la question contient une demande d'activité/type spécifique
     motifs_type_demande = [r"\bcours\s+de\s+(.+)", r"\bcours\s+d['’](.+)", 
                            r"\bformation\s+(?:en|de|à|a)\s+(.+)", r"\bstage\s+(?:en|de|à|a)\s+(.+)",
-                            r"\bséance\s+(?:de|d['’])\s*(.+)", r"\binitiation\s+(?:à|a)\s+(.+)",]
+                            r"\binitiation\s+(?:à|a)\s+(.+)",]
     for motif in motifs_type_demande:
         match = re.search(motif, question)
         if match:
@@ -357,8 +372,9 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
     m = re.search(r"(\d+)\s*ans", query.lower())
     age_demande = int(m.group(1)) if m else None
 
-    # filtre type évènement
+    # ype évènement
     type_info = extraire_type_evenement(query)
+
     type_evenement = type_info["type"]
     type_statut = type_info["statut"]
 
@@ -368,7 +384,8 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
     if type_statut == "inconnu":
         print(
             f"Type/domaine demandé non pris en charge : "
-            f"{type_evenement}")
+            f"{type_evenement}"
+        )
         return []
 
     results = []
@@ -441,22 +458,14 @@ def recherche_event_pertinent(query, k = 100, max_results = 20):
         print("-> temporel OK")
 
         # filtre type d'évènement
-        # texte = (str(event.get("title", "")) + " " + str(event.get("keywords_fr", ""))).lower()
-        # mots_recherches = type_keywords.get(type_evenement, [])
+        if type_evenement is not None:
 
-        # if mots_recherches:
-        #     if not any(mot in texte for mot in mots_recherches):
-        #         print("-> rejet type")
-        #         continue
+            type_event = determiner_type_evenement(event)
 
-        if type_statut == "connu":
-            texte = (
-                str(event.get("title_fr", "")) +
-                " " +
-                str(event.get("keywords_fr", ""))).lower()
+            print("Type demandé :", type_evenement)
+            print("Type détecté événement :", type_event)
 
-            mots_recherches = type_keywords[type_evenement]
-            if not any(mot in texte for mot in mots_recherches):
+            if type_event != type_evenement:
                 print("-> rejet type")
                 continue
 
@@ -651,7 +660,7 @@ class PulsEventRAG:
             filtered.append(e)
 
         # Champs à conserver
-        champs_a_garder = ["uid", "canonicalurl", "title_fr", "description_fr", "longdescription_fr", "conditions_fr", "timings",
+        champs_a_garder = ["uid", "canonicalurl", "title_fr", "description_fr", "longdescription_fr", "keywords_fr", "conditions_fr", "timings",
                             "daterange_fr", "firstdate_begin", "lastdate_end", "location_name", "location_address", 
                             "location_postalcode", "location_city", "location_department", "location_region", "age_min", "age_max", "registration"]
         today = datetime.now(timezone.utc)
@@ -882,4 +891,4 @@ class PulsEventRAG:
 
 # Tests
 if __name__ == "__main__":
-    print(generate_answer("Je cherche un cours de plongée sous-marine à Reims."))
+    print(generate_answer("Y a-t-il un concert à Strasbourg ?"))
