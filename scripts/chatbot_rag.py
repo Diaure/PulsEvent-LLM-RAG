@@ -267,17 +267,18 @@ def event_is_in_interval(event, start, end):
 # fonction permettant de rechercher par mots clés
 # type de mots-clés
 type_keywords = {
-    "atelier": [
-        "atelier", "créatif", "création", "initiation",
-        "fabrication", "cuisine", "maquette", "bricolage"],
-    "concert": [
-        "concert", "musique", "chorale", "orchestre", "récital"],
-    "exposition": [
-        "exposition", "vernissage", "musée", "galerie"],
-    "visite": [
-        "visite", "visite guidée", "patrimoine", "découverte"],
-    "spectacle": [
-        "spectacle", "théâtre", "danse", "marionnette", "cirque"]}
+    "atelier": ["atelier", "créatif", "création", "initiation", "fabrication", "cuisine", "maquette", "bricolage"],
+
+    "concert": ["concert", "musique", "musicale", "musical", "musicales", "musique classique", "musique ancienne",
+        "chorale",  "choral", "chœur", "choeur","orchestre", "orchestre symphonique", "orchestre de chambre",
+        "récital", "recital", "opéra", "opera", "opérette", "operette", "symphonie", "symphonique", "jazz", 
+        "chant", "chants", "vocal", "vocale", "lyrique"],
+
+    "exposition": ["exposition", "vernissage", "musée", "galerie"],
+
+    "visite": ["visite", "visite guidée", "patrimoine", "découverte"],
+
+    "spectacle": ["spectacle", "théâtre", "danse", "marionnette", "cirque"]}
 
 def determiner_type_evenement(event):
     textes = []
@@ -341,8 +342,9 @@ def extraire_type_evenement(question):
     # Si aucun type précis
     return {"type": None, "statut": "aucun"}
 
+
 # Recherche des évènements pertinents en fonction de l'actualité de l'évènement au moment de l'envoi du prompt
-def recherche_event_pertinent(query, k = 100, max_results = 20):
+def recherche_event_pertinent(query, k = 300, max_results = 20):
     index, metadata = load_faiss_index()
 
     print("FAISS :", index.ntotal)
@@ -579,13 +581,6 @@ def generate_answer(question):
     context = build_context(event)
     answer = generate_answer_from_context(question, context)
 
-    # chain = prompt | chatbot_llm
-    # response = chain.invoke(
-    #     {
-    #         "context": context,
-    #         "question": question
-    #     })
-
     return {"answer": answer, "events": event, "context": context}
 
 
@@ -758,6 +753,9 @@ class PulsEventRAG:
                 metadata.append({
                     "uid": e.get("uid"),
                     "title": e.get("title_fr"),
+                    "keywords": e.get("keywords_fr"),
+                    "description": e.get("description_fr"),
+                    "longdescription": e.get("longdescription_fr"),
                     "city": e.get("location_city"),
                     "lieu": e.get("location_name"),
                     "date": e.get("daterange_fr"),
@@ -905,4 +903,4 @@ class PulsEventRAG:
 
 # Tests
 if __name__ == "__main__":
-    print(generate_answer("Quels événements sont prévus ce week-end à Metz ?"))
+    print(generate_answer("Je cherche des ateliers à Charleville-Mézières."))

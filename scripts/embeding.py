@@ -1,6 +1,6 @@
 import os
 import pickle
-from mistralai import Mistral
+from mistralai.client import Mistral
 import tqdm
 from dotenv import load_dotenv
 import time
@@ -22,22 +22,55 @@ client = Mistral(api_key=api_key)
 model = "mistral-embed"
 
 # Envoi des requêtes par batch
-BATCH_SIZE = 64
+BATCH_SIZE = 32
 embeddings = []
 SLEEP_TIME = 1.0 
+CHECKPOINT_FILE = "./data/embeddings_checkpoint.pkl"
+
+# Charger un éventuel checkpoint
+if os.path.exists(CHECKPOINT_FILE):
+
+    with open(CHECKPOINT_FILE, "rb") as f:
+        embeddings = pickle.load(f)
+
+    print(
+        f"Checkpoint trouvé : "
+        f"{len(embeddings)} embeddings déjà calculés"
+    )
+
+else:
+    embeddings = []
+
+# Nombre de chunks déjà traités
+start = len(embeddings)
+
+print(f"Reprise à partir du chunk : {start}")
 
 def embed_batch(batch):
     texts = [c["chunk"] for c in batch]
+
     while True:
         try:
-            response = client.embeddings.create(model = model, inputs = texts)
+            response = client.embeddings.create(
+                model=model,
+                inputs=texts
+            )
+
             return [item.embedding for item in response.data]
+
         except Exception as e:
-            if "429" in str(e):
-                print("Rate limit atteint → pause 5 secondes…")
-                time.sleep(5)
+            error = str(e)
+
+            if "429" in error:
+                print("Rate limit atteint → pause 10 secondes...")
+                time.sleep(10)
+
+            elif "ReadTimeout" in error or "timed out" in error.lower():
+                print("Timeout Mistral → nouvelle tentative dans 10 secondes...")
+                time.sleep(10)
+
             else:
-                raise e
+                raise
 
 # Vectorisation par batch
 for i in tqdm.tqdm(range(0, len(chunks), BATCH_SIZE), desc="Vectorisation Mistral"):

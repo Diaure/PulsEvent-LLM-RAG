@@ -2,5 +2,6 @@
 .venv/
 .streamlit-venv/
 data/embeddings.pkl
+data/embeddings_checkpoint.pkl
 faiss_index/*.idx
 faiss_index/*.pkl
