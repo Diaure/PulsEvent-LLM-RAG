@@ -31,6 +31,10 @@ def load_faiss_index():
         d = 1024
         index = faiss.IndexFlatL2(d)
 
+        # 200 vecteurs fictifs cohérents avec les 200 métadonnées
+        mock_vectors = np.random.rand(200, d).astype("float32")
+        index.add(mock_vectors)
+
         metadata = [
         {
             "uid": i,
