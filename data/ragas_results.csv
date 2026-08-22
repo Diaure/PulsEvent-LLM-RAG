@@ -1,2 +1,26 @@
 question,answer,reference,faithfulness,answer_relevancy,context_precision,context_recall
-Y a-t-il un concert à Strasbourg ?,Je n'ai trouvé aucun événement correspondant à votre recherche.,"Plusieurs concerts sont disponibles à Strasbourg. Parmi les plus pertinents figurent: - Concert de musique classique à Strasbourg – Ensemble Musicâme France - Vêpres italiennes des XVIème et XVIIème siècles par l'Ensemble Triosa. Pour chacun des évènements, les dates, les conditions de participation et les informations pratiques sont indiquées lorsqu'elles sont disponibles",0.0,0.0,0.0,1.0
+Y a-t-il un concert à Strasbourg ?,"Oui, il y a plusieurs concerts à Strasbourg le **samedi 19 septembre 2026** :
+
+1. **Musique autour de Bach au Musée de l'Œuvre Notre-Dame**
+   - **Ville** : Strasbourg
+   - **Lieu** : Musée de l'Œuvre Notre-Dame
+   - **Dates et horaires** : 15h00, 15h30, 16h00, 16h30, 17h00 (durée : 10 minutes par session)
+   - **Conditions** : Non renseigné
+   - **Âge minimum/maximum** : Non renseigné
+   - **Lien** : [Musique autour de Bach](https://openagenda.com/culture/events/musique-autour-de-bach-au-musee-de-loeuvre-notre-dame)
+
+2. **Carte blanche à l’Opéra Studio**
+   - **Ville** : Strasbourg
+   - **Lieu** : Opéra national du Rhin
+   - **Date et horaire** : 11h00
+   - **Conditions** : Non renseigné
+   - **Âge minimum/maximum** : Non renseigné
+   - **Lien** : [Carte blanche à l’Opéra Studio](https://openagenda.com/culture/events/carte-blanche-a-lopera-studio-6946723)
+
+3. **Deux orgues à Sainte-Aurélie, concert et présentation**
+   - **Ville** : Strasbourg
+   - **Lieu** : Église protestante Sainte-Aurélie
+   - **Date et horaire** : 17h00
+   - **Conditions** : Non renseigné
+   - **Âge minimum/maximum** : Non renseigné
+   - **Lien** : [Deux orgues à Sainte-Aurélie](https://openagenda.com/culture/events/deux-orgues-a-sainte-aurelie-concert-et-presentation)","Plusieurs concerts sont disponibles à Strasbourg. Parmi les plus pertinents figurent: - Musique autour de Bach au Musée de l'Œuvre Notre-Dame – Carte blanche à l’Opéra Studio. Pour chacun des évènements, les dates, les conditions de participation et les informations pratiques sont indiquées lorsqu'elles sont disponibles",1.0,0.8538059967162507,0.9999999999,1.0
