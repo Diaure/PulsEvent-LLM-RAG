@@ -402,7 +402,8 @@ def recherche_event_pertinent(query, k = 1000, max_results = 20):
 
     # Recherche FAISS
     q_emb = embed_query(query) # transforme le prompt en numérique
-    distances, indices = index.search(np.array(q_emb, dtype="float32").reshape(1, -1), k) # transforme la liste de floats en tableau numpy avec vecteurs et dimension
+    query_vector = np.asarray(q_emb, dtype="float32").reshape(1, -1)
+    distances, indices = index.search(query_vector, k) # transforme la liste de floats en tableau numpy avec vecteurs et dimension
 
     # Filtre résultats FAISS
     results = []
