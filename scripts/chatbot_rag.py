@@ -69,7 +69,7 @@ model_llm = "mistral-large-latest"
 if os.getenv("CI") == "true":
     class MockEmbeddings:
         def embed_query(self, text):
-            return np.random.rand(384).tolist()
+            return np.random.rand(1024).tolist()
     embeddings_model = MockEmbeddings()
 
     class MockLLM:
