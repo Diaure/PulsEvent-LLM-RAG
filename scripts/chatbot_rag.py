@@ -407,6 +407,11 @@ def recherche_event_pertinent(query, k = 1000, max_results = 20):
     # Recherche FAISS
     q_emb = embed_query(query) # transforme le prompt en numérique
     query_vector = np.asarray(q_emb, dtype="float32").reshape(1, -1)
+
+    print("DEBUG dimension query :", query_vector.shape)
+    print("DEBUG dimension index :", index.d)
+    print("DEBUG ntotal index    :", index.ntotal)
+
     distances, indices = index.search(query_vector, k) # transforme la liste de floats en tableau numpy avec vecteurs et dimension
 
     # Filtre résultats FAISS
@@ -952,4 +957,4 @@ class PulsEventRAG:
 
 # Tests
 if __name__ == "__main__":
-    print(generate_answer("Je cherche un cours de plongée sous-marine à Reims."))
+    print(generate_answer("Que faire à Reims demain pour un enfant de 8 ans ?"))

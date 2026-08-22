@@ -58,7 +58,7 @@ def test_rag_filtrage():
 
 # Test fonctionnel: pipeline complet RAG
 def test_rag_pipeline_complet():
-    question = "Que faire à Reims demain pour un enfant de 8 ans ?"
+    question = "Je cherche un atelier pour un enfant de 8 ans à Reims."
 
     results = recherche_event_pertinent(question)
 
