@@ -28,7 +28,7 @@ def load_faiss_index():
     # Charge FAISS en local, mock en CI/CD.
     if os.getenv("CI") == "true":
         # Mock FAISS index pour CI/CD
-        d = 384
+        d = 1024
         index = faiss.IndexFlatL2(d)
 
         metadata = [
@@ -267,16 +267,20 @@ def event_is_in_interval(event, start, end):
 # fonction permettant de rechercher par mots clés
 # type de mots-clés
 type_keywords = {
-    "atelier": ["atelier", "créatif", "création", "initiation", "fabrication", "cuisine", "maquette", "bricolage"],
+    "atelier": ["atelier", "ateliers", "workshop", "activité créative", "activité manuelle", "atelier créatif", 
+                "atelier artistique", "ateliers culturels", "Marionnettes"],
 
     "concert": ["concert", "musique", "musicale", "musical", "musicales", "musique classique", "musique ancienne",
         "chorale",  "choral", "chœur", "choeur","orchestre", "orchestre symphonique", "orchestre de chambre",
         "récital", "recital", "opéra", "opera", "opérette", "operette", "symphonie", "symphonique", "jazz", 
-        "chant", "chants", "vocal", "vocale", "lyrique"],
+        "chant", "chants", "vocal", "vocale", "lyrique", "musique live", "performance musicale",
+        "représentation musicale", "ensemble musical", "spectacle musical",],
 
-    "exposition": ["exposition", "vernissage", "musée", "galerie"],
+    "exposition": ["exposition", "vernissage", "musée", "galerie", "Visite libre", "Visite libre", 
+                    "exposition immersive"],
 
-    "visite": ["visite", "visite guidée", "patrimoine", "découverte"],
+    "visite": ["visite", "visite guidée",  "Visite guidée", "Visite", "patrimoine", "découverte", 
+               "Découverte commentée"],
 
     "spectacle": ["spectacle", "théâtre", "danse", "marionnette", "cirque"]}
 
@@ -323,17 +327,20 @@ def extraire_type_evenement(question):
     # Type connu dans la base
     for categorie, mots in type_keywords.items():
         for mot in mots:
-            if re.search(r"\b" + re.escape(mot) + r"\b", question):
+            motif = r"\b" + re.escape(mot.lower()) + r"(?:s)?\b"
+            if re.search(motif, question):
                 return {
                     "type": categorie,
                     "statut": "connu"}
 
     # Déterminer si la question contient une demande d'activité/type spécifique
-    motifs_type_demande = [r"\bcours\s+de\s+(.+)", r"\bcours\s+d['’](.+)", 
-                           r"\bformation\s+(?:en|de|à|a)\s+(.+)", r"\bstage\s+(?:en|de|à|a)\s+(.+)",
-                            r"\binitiation\s+(?:à|a)\s+(.+)",]
-    for motif in motifs_type_demande:
-        match = re.search(motif, question)
+    motifs_type_demande = [r"\bcours\s+de\s+(.+)", 
+                           r"\bcours\s+d['’](.+)", 
+                           r"\bformation\s+(?:en|de|à|a)\s+(.+)", 
+                           r"\bstage\s+(?:en|de|à|a)\s+(.+)",
+                           r"\binitiation\s+(?:à|a)\s+(.+)",]
+    for motifs in motifs_type_demande:
+        match = re.search(motifs, question)
         if match:
             return {
                 "type": match.group(0).strip(),
@@ -344,20 +351,42 @@ def extraire_type_evenement(question):
 
 
 # Recherche des évènements pertinents en fonction de l'actualité de l'évènement au moment de l'envoi du prompt
-def recherche_event_pertinent(query, k = 300, max_results = 20):
+def recherche_event_pertinent(query, k = 1000, max_results = 20):
     index, metadata = load_faiss_index()
 
     print("FAISS :", index.ntotal)
     print("Metadata :", len(metadata))
 
-    q_emb = embed_query(query) # transforme le prompt en numérique
-    distances, indices = index.search(np.array(q_emb, dtype="float32").reshape(1, -1), k) # transforme la liste de floats en tableau numpy avec vecteurs et dimension
-
+    # Extraire les contraintes de la question
     intervalle = extraire_intervalle_temporel(query)
 
+    # Ville
     ville = extraire_ville(query)
-    print("VILLE EXTRAITE :", ville)
-    print("INTERVALLE :", intervalle)
+
+    # extraction âge
+    m = re.search(r"(\d+)\s*ans", query.lower())
+    age_demande = int(m.group(1)) if m else None
+
+    # Type évènement
+    type_info = extraire_type_evenement(query)
+    type_evenement = type_info["type"]
+    type_statut = type_info["statut"]
+
+    print("\n========== CONTRAINTES ==========")
+    print("Question :", query)
+    print("Ville :", ville)
+    print("Intervalle :", intervalle)
+    print("Âge :", age_demande)
+    print("Type :", type_evenement)
+    print("Statut type :", type_statut)
+    print("=================================\n")
+
+    # Vérification du type
+    if type_statut == "inconnu":
+        print(
+            f"Type/domaine demandé non pris en charge : "
+            f"{type_evenement}")
+        return []
 
     # Vérifier si la ville extraite existe dans les données
     if ville is not None:
@@ -371,37 +400,23 @@ def recherche_event_pertinent(query, k = 300, max_results = 20):
                 "-> aucun événement")
             return []
 
-    # extraction âge
-    m = re.search(r"(\d+)\s*ans", query.lower())
-    age_demande = int(m.group(1)) if m else None
+    # Recherche FAISS
+    q_emb = embed_query(query) # transforme le prompt en numérique
+    distances, indices = index.search(np.array(q_emb, dtype="float32").reshape(1, -1), k) # transforme la liste de floats en tableau numpy avec vecteurs et dimension
 
-    # Type évènement
-    type_info = extraire_type_evenement(query)
-
-    type_evenement = type_info["type"]
-    type_statut = type_info["statut"]
-
-    print("TYPE ÉVÈNEMENT :", type_evenement)
-    print("STATUT TYPE :", type_statut)
-
-    if type_statut == "inconnu":
-        print(
-            f"Type/domaine demandé non pris en charge : "
-            f"{type_evenement}"
-        )
-        return []
-
+    # Filtre résultats FAISS
     results = []
     uid_vu = set()
-
+    
     nb_actif = 0
     nb_ville = 0
     nb_date = 0
     nb_age = 0
     nb_event_type = 0
 
-    print(indices.shape)
-    print(indices[0][:20])
+    print("\n========== FAISS ==========")
+    print("Nombre de résultats FAISS :", len(indices[0]))
+    print("============================\n")
 
     for idx in indices[0]:
         print(idx)
@@ -410,12 +425,8 @@ def recherche_event_pertinent(query, k = 300, max_results = 20):
         print("\n---------------------")
         print("\nEvent:", event["title"])
 
-        # éviter doublons
-        if event["uid"] in uid_vu:
-            print("REJET uid")
-            continue
-
-        # filtre actif
+        
+        # filtre évènement actif
         if not est_actif(event):
             print("-> rejet actif")
             continue
@@ -432,7 +443,7 @@ def recherche_event_pertinent(query, k = 300, max_results = 20):
         nb_ville += 1
         print("-> ville OK")
 
-        # # filtre âge
+        # filtre âge
         if age_demande is not None:
             age_min_event = event.get("age_minimum")
             age_max_event = event.get("age_maximum")
@@ -462,38 +473,52 @@ def recherche_event_pertinent(query, k = 300, max_results = 20):
 
         # filtre type d'évènement
         if type_evenement is not None:
-            print("\n========== DEBUG TYPE ==========")
-            print("TYPE DEMANDÉ :", repr(type_evenement))
-
             type_event = determiner_type_evenement(event)
 
-            print("UID :", event.get("uid"))
-            print("TITLE :", repr(event.get("title")))
-            print("TITLE_FR :", repr(event.get("title_fr")))
-            print("DESCRIPTION :", repr(event.get("description")))
-            print("DESCRIPTION_FR :", repr(event.get("description_fr")))
-            print("LONGDESCRIPTION :", repr(event.get("longdescription")))
-            print("LONGDESCRIPTION_FR :", repr(event.get("longdescription_fr")))
-            print("KEYWORDS_FR :", repr(event.get("keywords_fr")))
-            print("TYPE DÉTECTÉ :", repr(type_event))
-            print("================================")
-
             print("Type demandé :", type_evenement)
-            print("Type détecté événement :", type_event)
+            print("Type détecté :", type_event)
 
             if type_event is None or type_evenement not in type_event:
                 print("-> rejet type")
                 continue
-
-        print("-> type OK")
         nb_event_type += 1
-           
-        uid_vu.add(event["uid"])
-        results.append(event)
+        print("-> type OK")
 
+        # Eviter les doublons
+        if event["uid"] in uid_vu:
+            print("-> doublon UID")
+            continue
+        uid_vu.add(event["uid"])
+
+        results.append(event)
         if len(results) >= max_results:
             break
 
+
+        #     print("UID :", event.get("uid"))
+        #     print("TITLE :", repr(event.get("title")))
+        #     print("TITLE_FR :", repr(event.get("title_fr")))
+        #     print("DESCRIPTION :", repr(event.get("description")))
+        #     print("DESCRIPTION_FR :", repr(event.get("description_fr")))
+        #     print("LONGDESCRIPTION :", repr(event.get("longdescription")))
+        #     print("LONGDESCRIPTION_FR :", repr(event.get("longdescription_fr")))
+        #     print("KEYWORDS_FR :", repr(event.get("keywords_fr")))
+        #     print("TYPE DÉTECTÉ :", repr(type_event))
+        #     print("================================")
+
+        #     print("Type demandé :", type_evenement)
+        #     print("Type détecté événement :", type_event)
+
+            
+        
+        
+           
+        # uid_vu.add(event["uid"])
+        # results.append(event)
+
+        # if len(results) >= max_results:
+        #     break
+    # Debug final
     print("\n========== DEBUG ==========")
     print("Ville détectée :", ville)
     print("Intervalle :", intervalle)
@@ -510,7 +535,8 @@ def recherche_event_pertinent(query, k = 300, max_results = 20):
 # Définition du prompt
 prompt = ChatPromptTemplate.from_template(
 """
-Tu es un assistant qui recommande des événements culturels dans la région Grand Est (France).
+Tu es l'assistant officiel de PulsEvent.
+Tu recommandes uniquement des événements culturels présents dans le contexte fourni.
 Tu dois répondre en français, de manière claire et utile.
 Tu ne connais AUCUN événement en dehors du contexte fourni.
 
@@ -522,9 +548,19 @@ Voici des informations issues de la base d'événements (contexte RAG):
 
 Consignes:
 - Tu ne dois utiliser QUE les événements présents dans le contexte.
-- Il est interdit d'utiliser tes connaissances générales.
-- Il est interdit d'inventer un événement.
-- Tu n'as pas accès à Internet.
+- Tu ne dois jamais utiliser tes connaissances générales.
+- Tu ne dois jamais inventer un événement.
+- Tu ne dois jamais inventer:
+   - une date
+   - une heure
+   - une ville
+   - un lieu
+   - un prix
+   - une condition
+   - un âge
+   - une adresse
+   - un lien
+- Si une information est "Non renseigné" ou NaN, indique "Non renseigné".
 - Si le contexte est vide ou si la ville demandée n'est pas présente dans la région Grand Est: 
     -Tu dois répondre EXACTEMENT la phrase suivante, sans rien ajouter: "Je n'ai trouvé aucun événement correspondant à votre recherche dans la base de données."
     - Tu NE DOIS PAS proposer d’alternatives.
@@ -532,6 +568,11 @@ Consignes:
     - Tu NE DOIS PAS recommander d’autres événements.
     - Tu NE DOIS PAS ajouter d’explications.
     - Tu NE DOIS PAS reformuler la phrase.
+- Si l'utilisateur demande un type précis d'événement, respecte strictement ce type.
+- Ne présente que les événements qui correspondent réellement au type demandé.
+- Un événement ne doit pas être considéré comme un atelier simplement parce que sa description mentionne une activité, un thème ou un lieu lié à l'artisanat, à la création ou à l'apprentissage.
+- Si aucun événement ne correspond réellement au type demandé, indique qu'aucun événement correspondant n'a été trouvé.
+- Ne propose jamais spontanément des événements "proches", "similaires" ou "susceptibles d'intéresser" l'utilisateur.
 - Mentionne le titre, la ville, les dates, les conditions, l'âge minimum et maximum et le lien quand c'est possible.
 
 Réponse :
@@ -576,7 +617,9 @@ def generate_answer(question):
     event = recherche_event_pertinent(question, max_results = 10)
 
     if len(event) == 0:
-        return {"answer": "Je n'ai trouvé aucun événement correspondant à votre recherche.", "events": [], "context": ""}
+        return {"answer": "Je n'ai trouvé aucun événement correspondant à votre recherche.", 
+                "events": [], 
+                "context": ""}
     
     context = build_context(event)
     answer = generate_answer_from_context(question, context)
@@ -753,9 +796,9 @@ class PulsEventRAG:
                 metadata.append({
                     "uid": e.get("uid"),
                     "title": e.get("title_fr"),
-                    "keywords": e.get("keywords_fr"),
-                    "description": e.get("description_fr"),
-                    "longdescription": e.get("longdescription_fr"),
+                    "keywords_fr": e.get("keywords_fr"),
+                    "description_fr": e.get("description_fr"),
+                    "longdescription_fr": e.get("longdescription_fr"),
                     "city": e.get("location_city"),
                     "lieu": e.get("location_name"),
                     "date": e.get("daterange_fr"),
@@ -899,8 +942,9 @@ class PulsEventRAG:
     def ask(self, question: str) -> str:
         if self.index is None:
             return "⚠️ L’index n’est pas encore construit. Lancez /rebuild."
-        return generate_answer(question)
+        result =  generate_answer(question)
+        return result["answer"]
 
 # Tests
 if __name__ == "__main__":
-    print(generate_answer("Je cherche des ateliers à Charleville-Mézières."))
+    print(generate_answer("Je cherche un cours de plongée sous-marine à Reims."))

@@ -81,7 +81,7 @@ questions_test = [
     # "Quels événements sont prévus ce week-end à Metz ?",
     # "Y a-t-il des événements gratuits à Nancy ?",
     # "Que faire en famille à Mulhouse ce week-end ?",
-    # "Je cherche des ateliers à Charleville-Mézières.",
+    # "Je cherche des ateliers culturels à Charleville-Mézières.",
     # "Quels événements sont adaptés aux seniors à Colmar ?",
     # "Je cherche une exposition le mois prochain à Strasbourg.",
     # "Je cherche un événement culturel à Tokyo.",
@@ -96,7 +96,7 @@ ground_truths = [
     # "Aucun évènement correspondant à cette recherche n'est disponible dans la base. Si aucun évènement, la réponse l'indique clairement sans proposer d'évènements hors du contexte demandé.",
     # "Les évènements de type 'atelier' à Charleville-Mézières présents dans la base sont - 'Nuée' (spectacle et atelier autour de la marionnette) - Les Quiquoi et le chien moche dont personne ne veut. Pour chaque atelier, la réponse précise les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
     # "Les événements adaptés aux seniors à Colmar retrouvés dans la base de données - '4026 Des jouets éternels ?' - Visite guidée de la Comédie de Colmar - Visite du bâtiment administratif du XIXe siècle. La réponse indique pour chacun des évènements les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
-    # "Plusieurs expositions disponibles à Strasbourg le mois prochain dan la base de données, dont: - Visite libre de l’exposition « Un Voyage à Strasbourg » - Archifoto 2026 - Visite guidée de l'exposition 'Un voyage à Strasbourg'. Pour chacune des expositions, les dates, les liens, les conditions sont précisées",
+    # "Plusieurs expositions disponibles à Strasbourg le mois prochain dan la base de données, dont: - Visite libre de l’exposition « Un Voyage à Strasbourg » - Visite guidée de l'exposition 'Un voyage à Strasbourg'. Pour chacune des expositions, les dates, les liens, les conditions sont précisées",
     # "Aucun événement correspondant n'est disponible dans la base. La réponse l'indiquer clairement sans proposer d'événements situés dans une autre ville.",
     # "Aucun cours de plongée sous-marine n'a été trouvé à Reims dans la base de données. La réponse n'invente aucun événement, ni ne propose d'autres activités."
 ]
