@@ -77,28 +77,28 @@ ragas_embeddings = HuggingFaceEmbeddings(
 # Questions tests & réponses attendues
 questions_test = [
     "Y a-t-il un concert à Strasbourg ?"
-    # "Je cherche un atelier pour un enfant de 8 ans à Reims.",
-    # "Quels événements sont prévus ce week-end à Metz ?",
-    # "Y a-t-il des événements gratuits à Nancy ?",
-    # "Que faire en famille à Mulhouse ce week-end ?",
-    # "Je cherche des ateliers culturels à Charleville-Mézières.",
-    # "Quels événements sont adaptés aux seniors à Colmar ?",
-    # "Je cherche une exposition le mois prochain à Strasbourg.",
-    # "Je cherche un événement culturel à Tokyo.",
-    # "Je cherche un cours de plongée sous-marine à Reims."
+    "Je cherche un atelier pour un enfant de 8 ans à Reims.",
+    "Quels événements sont prévus ce week-end à Metz ?",
+    "Y a-t-il des événements gratuits à Nancy ?",
+    "Que faire en famille à Mulhouse ce week-end ?",
+    "Je cherche des ateliers culturels à Charleville-Mézières.",
+    "Quels événements sont adaptés aux seniors à Colmar ?",
+    "Je cherche une exposition le mois prochain à Strasbourg.",
+    "Je cherche un événement culturel à Tokyo.",
+    "Je cherche un cours de plongée sous-marine à Reims."
 ]
 
 ground_truths = [
     "Plusieurs concerts sont disponibles à Strasbourg. Parmi les plus pertinents figurent: - Musique autour de Bach au Musée de l'Œuvre Notre-Dame – Carte blanche à l’Opéra Studio. Pour chacun des évènements, les dates, les conditions de participation et les informations pratiques sont indiquées lorsqu'elles sont disponibles"
-    # "Voici des ateliers adaptés à un enfant de 8 ans à Reims: - Atelier 'bacs de fouilles' pour les enfants - Ateliers culinaires pour enfants à la Belle Enchantée - Les coulisses de la création - Atelier 'Lumière de spectacle'. Pour chacun, les dates, les conditions de participation, les tranches d'âge concernées, et les liens des événements lorsque disponibles sont clairement mentionnés.",
-    # "Aucun événement correspondant à cette recherche n'est présent dans la base de données. La réponse n'invente pas d'événement, ni ne propose des activités non pertinentes.",
-    # "Plusieurs évènements gratuits à Nancy sont présents dans la base de données parmis lesquels: - Exposition Présents - Visite de Nancy Thermal : un projet né il y a 117 ans - Escape Game 'Panique en cabine'. Les dates, les conditions d'accès, la gratuité, ainsi que les informations complémentaires utiles pour chaque évènement sont clairement indiqués si disponibles.",
-    # "Aucun évènement correspondant à cette recherche n'est disponible dans la base. Si aucun évènement, la réponse l'indique clairement sans proposer d'évènements hors du contexte demandé.",
-    # "Les évènements de type 'atelier' à Charleville-Mézières présents dans la base sont - 'Nuée' (spectacle et atelier autour de la marionnette) - Les Quiquoi et le chien moche dont personne ne veut. Pour chaque atelier, la réponse précise les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
-    # "Les événements adaptés aux seniors à Colmar retrouvés dans la base de données - '4026 Des jouets éternels ?' - Visite guidée de la Comédie de Colmar - Visite du bâtiment administratif du XIXe siècle. La réponse indique pour chacun des évènements les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
-    # "Plusieurs expositions disponibles à Strasbourg le mois prochain dan la base de données, dont: - Visite libre de l’exposition « Un Voyage à Strasbourg » - Visite guidée de l'exposition 'Un voyage à Strasbourg'. Pour chacune des expositions, les dates, les liens, les conditions sont précisées",
-    # "Aucun événement correspondant n'est disponible dans la base. La réponse l'indiquer clairement sans proposer d'événements situés dans une autre ville.",
-    # "Aucun cours de plongée sous-marine n'a été trouvé à Reims dans la base de données. La réponse n'invente aucun événement, ni ne propose d'autres activités."
+    "Voici des ateliers adaptés à un enfant de 8 ans à Reims: - Atelier 'bacs de fouilles' pour les enfants - Ateliers culinaires pour enfants à la Belle Enchantée - Les coulisses de la création - Atelier 'Lumière de spectacle'. Pour chacun, les dates, les conditions de participation, les tranches d'âge concernées, et les liens des événements lorsque disponibles sont clairement mentionnés.",
+    "Aucun événement correspondant à cette recherche n'est présent dans la base de données. La réponse n'invente pas d'événement, ni ne propose des activités non pertinentes.",
+    "Plusieurs évènements gratuits à Nancy sont présents dans la base de données parmis lesquels: - Exposition Présents - Visite de Nancy Thermal : un projet né il y a 117 ans - Escape Game 'Panique en cabine'. Les dates, les conditions d'accès, la gratuité, ainsi que les informations complémentaires utiles pour chaque évènement sont clairement indiqués si disponibles.",
+    "Aucun évènement correspondant à cette recherche n'est disponible dans la base. Si aucun évènement, la réponse l'indique clairement sans proposer d'évènements hors du contexte demandé.",
+    "Les évènements de type 'atelier' à Charleville-Mézières présents dans la base sont - 'Nuée' (spectacle et atelier autour de la marionnette) - Les Quiquoi et le chien moche dont personne ne veut. Pour chaque atelier, la réponse précise les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
+    "Les événements adaptés aux seniors à Colmar retrouvés dans la base de données - '4026 Des jouets éternels ?' - Visite guidée de la Comédie de Colmar - Visite du bâtiment administratif du XIXe siècle. La réponse indique pour chacun des évènements les dates, les conditions ainsi que toutes informations pratiques lorsque disponibles.",
+    "Plusieurs expositions disponibles à Strasbourg le mois prochain dan la base de données, dont: - Visite libre de l’exposition « Un Voyage à Strasbourg » - Visite guidée de l'exposition 'Un voyage à Strasbourg'. Pour chacune des expositions, les dates, les liens, les conditions sont précisées",
+    "Aucun événement correspondant n'est disponible dans la base. La réponse l'indiquer clairement sans proposer d'événements situés dans une autre ville.",
+    "Aucun cours de plongée sous-marine n'a été trouvé à Reims dans la base de données. La réponse n'invente aucun événement, ni ne propose d'autres activités."
 ]
 
 

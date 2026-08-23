@@ -951,10 +951,15 @@ class PulsEventRAG:
 
     def ask(self, question: str) -> str:
         if self.index is None:
-            return "⚠️ L’index n’est pas encore construit. Lancez /rebuild."
+            return "L’index n’est pas encore construit. Lancez /rebuild."
+        print(">>> QUESTION :", question)
         result =  generate_answer(question)
+
+        print(">>> TYPE RESULT :", type(result))
+        print(">>> RESULT :", repr(result))
+        
         return result["answer"]
 
 # Tests
-if __name__ == "__main__":
-    print(generate_answer("Que faire à Reims demain pour un enfant de 8 ans ?"))
+# if __name__ == "__main__":
+#     print(generate_answer("Que faire à Reims demain pour un enfant de 8 ans ?"))

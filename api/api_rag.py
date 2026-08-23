@@ -17,7 +17,7 @@ def ask_question(payload: AskRequest):
     if not payload.question.strip():
         return {"error": "La question ne peut pas être vide."}
     answer = rag.ask(payload.question)
-    return {"question": payload.question, "answer": answer["answer"]}
+    return {"question": payload.question, "answer": answer}
 
 @app.post("/rebuild")
 def rebuild_index():
