@@ -1,31 +1,5 @@
 question,answer,reference,faithfulness,answer_relevancy,context_precision,context_recall
-Y a-t-il un concert à Strasbourg ?,"Oui, il y a plusieurs concerts à Strasbourg le **samedi 19 septembre 2026** :
-
-1. **Musique autour de Bach au Musée de l'Œuvre Notre-Dame**
-   - **Ville** : Strasbourg
-   - **Lieu** : Musée de l'Œuvre Notre-Dame (3 place du Château, 67000 Strasbourg)
-   - **Dates et horaires** :
-     - 15h00 - 15h10
-     - 15h30 - 15h40
-     - 16h00 - 16h10
-     - 16h30 - 16h40
-     - 17h00 - 17h10
-   - **Conditions** : Non renseigné
-   - **Âge** : Non renseigné
-   - **Lien** : [Musique autour de Bach](https://openagenda.com/culture/events/musique-autour-de-bach-au-musee-de-loeuvre-notre-dame)
-
-2. **Carte blanche à l’Opéra Studio**
-   - **Ville** : Strasbourg
-   - **Lieu** : Opéra national du Rhin (19 place Broglie, 67000 Strasbourg)
-   - **Date et horaire** : Samedi 19 septembre, 11h00 - 12h00
-   - **Conditions** : Non renseigné
-   - **Âge** : Non renseigné
-   - **Lien** : [Carte blanche à l’Opéra Studio](https://openagenda.com/culture/events/carte-blanche-a-lopera-studio-6946723)
-
-3. **Deux orgues à Sainte-Aurélie, concert et présentation**
-   - **Ville** : Strasbourg
-   - **Lieu** : Église protestante Sainte-Aurélie (Rue Martin Bucer, 67000 Strasbourg)
-   - **Date et horaire** : Samedi 19 septembre, 17h00 - 18h30
-   - **Conditions** : Non renseigné
-   - **Âge** : Non renseigné
-   - **Lien** : [Deux orgues à Sainte-Aurélie](https://openagenda.com/culture/events/deux-orgues-a-sainte-aurelie-concert-et-presentation)","Plusieurs concerts sont disponibles à Strasbourg. Parmi les plus pertinents figurent: - Musique autour de Bach au Musée de l'Œuvre Notre-Dame – Carte blanche à l’Opéra Studio. Pour chacun des évènements, les dates, les conditions de participation et les informations pratiques sont indiquées lorsqu'elles sont disponibles",1.0,0.8538059967162507,0.9999999999,1.0
+Quels événements sont prévus ce week-end à Metz ?,Je n'ai trouvé aucun événement correspondant à votre recherche.,"Aucun événement correspondant à cette recherche n'est présent dans la base de données. La réponse n'invente pas d'événement, ni ne propose des activités non pertinentes.",0.0,0.0,0.9999999999,1.0
+Que faire en famille à Mulhouse ce week-end ?,Je n'ai trouvé aucun événement correspondant à votre recherche.,"Aucun évènement correspondant à cette recherche n'est disponible dans la base. Si aucun évènement, la réponse l'indique clairement sans proposer d'évènements hors du contexte demandé.",1.0,-0.0,0.9999999999,0.5
+Je cherche un événement culturel à Tokyo.,Je n'ai trouvé aucun événement correspondant à votre recherche.,Aucun événement correspondant n'est disponible dans la base. La réponse l'indiquer clairement sans proposer d'événements situés dans une autre ville.,1.0,0.0,0.9999999999,0.5
+Je cherche un cours de plongée sous-marine à Reims.,Je n'ai trouvé aucun événement correspondant à votre recherche.,"Aucun cours de plongée sous-marine n'a été trouvé à Reims dans la base de données. La réponse n'invente aucun événement, ni ne propose d'autres activités.",0.0,0.0,0.9999999999,0.5

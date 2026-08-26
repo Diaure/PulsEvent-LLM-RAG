@@ -12,6 +12,7 @@ API utilisée :
 
 `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/evenements-publics-openagenda/records`
 
+
 ### Objectif
 
 Afin d'alimenter le système RAG, les événements ont été extraits depuis le jeu de données **Événements publics Open Agenda** disponible sur l'API ***Open Agenda***.
@@ -62,7 +63,7 @@ Le script `preprocessing.py`:
 - Filtre les évènements (archives, évènements institutionnels, etc.)
 - Conserve uniquement les champs utiles au chatbot (titre, description, lieu, dates, âge, lien…)
 - Ajoute un champ event_actif basé sur la date de fin
-- Construit un champ textuel complet texte_rag utilisé pour le RAG
+- Construit un champ textuel complet **texte_rag** utilisé pour le RAG
 - Exporte les données nettoyées au format JSON + CSV: 
 
 `data/ge_event_rag.json, data/ge_events_df.csv`.
@@ -71,7 +72,7 @@ Le script `preprocessing.py`:
 Le script `chunk.py` quant à lui:
 
 - Récupère le dataframe des évènements filtrés précédemment `data/ge_events_df.csv`
-- Utilise `RecursiveCharacterTextSplitter` pour découper le **document** *texte_rag* en segments:
+- Utilise `RecursiveCharacterTextSplitter` pour découper le **document - texte_rag** en segments:
 
     - taille des segments: `chunk_size = 700`
     - recouvrement: `chunk_overlap = 200`
@@ -86,8 +87,8 @@ Le script `chunk.py` quant à lui:
 
 ### Embedding - Vectorisation des chunks
 - Chargement des chunks
-- Initialisation du client Mistral (`mistral-embed`)
-- Vectorisation des chunks par batch de 64
+- Initialisation du client ***Mistral (`mistral-embed`)***
+- Vectorisation des chunks par batch de 32
 - Gestion automatique des erreurs de rate limit
 - Construit une structure contenant:
 
@@ -104,9 +105,9 @@ Objectif: Créer un index vectoriel **FAISS** à partir des embeddings généré
 
 - Charge les embeddings vectorisés: `data/embeddings.pkl`
 
-- Convertit les embeddings en tableau NumPy float32 (format requis par FAISS)
+- Convertit les embeddings en tableau NumPy **`float32`** (format requis par FAISS)
 
-- Initialise un index FAISS (IndexFlatL2) basé sur la distance euclidienne
+- Initialise un index **`FAISS IndexFlatL2`** basé sur la distance euclidienne
 
 - Ajoute tous les vecteurs dans l’index
 
@@ -118,50 +119,100 @@ Ces métadonnées permettent de reconstruire la réponse du chatbot après une r
 
 ## Développement du chatbot intelligent (RAG)
 
-### Fonctionnement général
+Le chatbot intelligent Puls Event repose sur une architecture **RAG (Retrieval-Augmented Generation)** permettant d'interroger la base d'événements indexés de manière sémantique.
 
-Le chatbot intelligent Puls-Event repose sur une architecture RAG (Retrieval-Augmented Generation) permettant d'interroger la base d'évènements indexés de manière sémantique.
+L'architecture du système peut être décrite selon deux niveaux complémentaires:
 
-Lorsqu'un utilisateur pose une question, plusieurs étapes sont exécutées:
+- **l'architecture globale du RAG**, qui présente l'ensemble du pipeline, depuis l'extraction des données jusqu'à la génération de la réponse.
+- **le pipeline détaillé de génération de réponse**, qui précise les traitements effectués lorsqu'un utilisateur soumet une requête, notamment l'extraction des contraintes et l'application des filtres métier.
 
-1. La question est vectorisée à l'aide du modèle d'embedding Mistral.
-2. Une recherche sémantique est effectuée dans l'index FAISS afin de récupérer les chunks les plus pertinents.
-3. Les chunks récupérés sont filtrés et regroupés par évènement afin d'éviter les doublons.
-4. Les métadonnées associées aux évènements sont utilisées pour reconstruire le contexte.
-5. Le modèle de langage génère une réponse adaptée à la requête de l'utilisateur.
+### Architecture globale
 
-Le chatbot est donc capable de:
+![architecture](https://raw.githubusercontent.com/Diaure/PulsEvent-LLM-RAG/main/Images/Image1.png)
 
-- rechercher des évènements par thématique
-- proposer des activités adaptées aux contraintes exprimées par l'utilisateur
-- répondre à des questions générales sur les évènements disponibles
-- fournir les informations utiles (dates, lieu, description, lien vers l'évènement).
+Le pipeline global est composé de deux grandes phases.
 
-### Recherche sémantique
+- **Phase de préparation et d'indexation**: phase qui correspond au pipeline décrit dans la section `Indexation — Preprocessing, Chunking, Embedding et FAISS`.
 
-Le moteur de recherche utilise:
+- **Phase de recherche et de génération**
+Lorsqu'un utilisateur pose une question, le système utilise l'index précédemment construit pour retrouver les événements pertinents et générer une réponse à partir des informations récupérées.
 
-- l'index vectoriel FAISS construit précédemment
-- les embeddings générés avec le modèle `mistral-embed`
-- les métadonnées sauvegardées dans `metadata.pkl`.
+Cependant, pour Puls-Event, cette phase est enrichie par un pipeline spécifique permettant de prendre explicitement en compte les contraintes exprimées par l'utilisateur.
 
-La recherche s'effectue sur les chunks les plus proches de la requête utilisateur afin de récupérer uniquement les informations pertinentes.
+### Pipeline de génération de réponse
 
-### Génération des réponses
+![pipeline](https://raw.githubusercontent.com/Diaure/PulsEvent-LLM-RAG/main/Images/Image2.png)
 
-Une fois les évènements pertinents récupérés:
+Le pipeline de génération de réponse constitue un niveau de détail supplémentaire de la phase **Recherche → Génération** du RAG.
 
-- les informations sont injectées dans un prompt construit dynamiquement
-- le LLM reçoit uniquement le contexte nécessaire
-- le modèle génère une réponse naturelle.
+Lorsqu'une question est reçue, le système commence par analyser la requête afin d'en extraire les contraintes utiles à la recherche d'événements.
 
-Lorsque plusieurs évènements correspondent à la demande, le chatbot peut retourner une liste structurée contenant:
+**1. Extraction des contraintes**
 
-- le titre de l'évènement
-- la ville
-- la date
-- le lieu
-- le lien OpenAgenda associé.
+La requête utilisateur est analysée afin d'identifier les différentes contraintes pouvant être utilisées pour sélectionner les événements.
+
+Les principales contraintes prises en compte sont **Ville, Date / temporalité, Âge, Type d'événement**
+
+Par exemple, pour une requête telle que:
+
+*« Y a-t-il des concerts à Strasbourg ce week-end ? »*, le système peut identifier:
+
+- Ville : Strasbourg
+- Date / temporalité : ce week-end
+- Âge : nonspécifié
+- Type d'événement : concert.
+
+Ces contraintes sont ensuite utilisées dans les étapes de recherche et de filtrage.
+
+**2. Recherche des événements candidats**
+
+La requête utilisateur est également utilisée pour effectuer une recherche sémantique dans l'index FAISS.
+
+Le système recherche les événements dont les représentations vectorielles sont les plus proches de la requête.
+
+Cette étape permet d'obtenir un ensemble *`d'événements candidats`* susceptibles de répondre à la demande.
+
+La recherche sémantique constitue ainsi le mécanisme de *`retrieval du RAG`*.
+
+**3. Application des filtres métier**
+
+Les événements candidats sont ensuite confrontés aux contraintes extraites de la requête.
+
+Des filtres métier peuvent notamment être appliqués sur:
+
+- la ville ;
+- la date ou la période ;
+- l'âge ;
+- le type d'événement.
+
+Cette étape permet de compléter la recherche sémantique par des règles basées sur les métadonnées des événements.
+
+Le système ne se limite donc pas à la proximité vectorielle: les contraintes explicites de l'utilisateur sont également prises en compte dans la sélection des résultats.
+
+**4. Analyse et sélection des événements**
+
+Après l'application des filtres métier, les événements restants sont analysés afin de sélectionner les éléments les plus pertinents pour répondre à la requête.
+
+Cette étape permet de constituer le contexte final transmis au modèle de langage.
+
+**5. Génération de la réponse**
+
+Le LLM reçoit alors la question de l'utilisateur ainsi que les événements sélectionnés et leurs informations associées.
+
+Il génère une réponse naturelle et contextualisée à partir de ces éléments.
+
+Lorsque plusieurs événements correspondent à la demande, la réponse peut notamment présenter:
+
+- le titre de l'événement ;
+- la ville ;
+- la date ;
+- le lieu ;
+- la description ;
+- le lien OpenAgenda.
+
+L'objectif est de produire une réponse basée sur les événements effectivement récupérés et sélectionnés par le pipeline.
+
+Ainsi, les deux architectures sont complémentaires.
 
 ### Reconstruction de l'index
 
@@ -178,36 +229,37 @@ Cette fonctionnalité facilite la mise à jour régulière des données lorsque 
 
 ## Évaluation du chatbot
 
-Afin d'évaluer les performances du système RAG, plusieurs jeux de questions ont été construits.
+L'évaluation porte sur les différentes étapes du pipeline RAG afin de mesurer à la fois la qualité de la récupération des événements et la qualité des réponses générées.
 
-L'évaluation porte notamment sur:
+Plusieurs jeux de questions ont été construits afin de couvrir différents types de requêtes:
 
-- la pertinence des évènements proposés
-- la qualité des réponses générées
-- la capacité du chatbot à comprendre des formulations variées
-- la robustesse face aux questions hors contexte.
+- recherche d'événements culturels
+- recherche par ville
+- recherche par période
+- recherche par âge
+- recherche par type d'événement
+- recommandations combinant plusieurs contraintes
+- formulations variées d'une même demande
+- questions hors contexte.
 
-Les tests ont été réalisés sur différentes catégories de requêtes:
-
-- recherche d'évènements culturels
-- recherche d'activités selon une ville ou une période
-- recommandations personnalisées
-- questions générales sur les évènements disponibles.
-
-Les réponses générées ont été exportées dans un fichier CSV afin de pouvoir être comparées et analysées.
-
-Les principaux indicateurs étudiés sont:
+Les performances du système sont notamment évaluées à l'aide des métriques suivantes:
 
 - **Faithfulness**: cohérence entre la réponse et le contexte récupéré ;
 - **Answer Relevancy**: pertinence de la réponse apportée ;
 - **Context Precision**: qualité des documents retrouvés ;
 - **Context Recall**: capacité à récupérer les informations attendues.
 
-Ces métriques permettent d'évaluer la qualité globale du pipeline RAG et d'identifier les pistes d'amélioration du système.
+| Métrique | Score global |
+|---|---:|
+| Faithfulness | **0.69** |
+| Answer Relevancy | **0.45** |
+| Context Precision | **0.78** |
+| Context Recall | **0.50** |
+
 
 ## Création d'une API REST
 
-Le chatbot est exposé sous la forme d'une API REST développée avec FastAPI.
+Le chatbot est exposé sous la forme d'une **API REST développée avec FastAPI**.
 
 L'API permet :
 
@@ -215,11 +267,26 @@ L'API permet :
 - de reconstruire automatiquement l'index vectoriel ;
 - d'intégrer facilement le système RAG dans une application tierce.
 
-L'API est lancée depuis la racine du projet: `uvicorn api.api_rag:app --reload`, et est accessible sur `
-http://localhost:8000`. 
+**Dockerisation**
 
-La documentation interactive Swagger est disponible sur `
-http://localhost:8000/docs`
+L'API est également exécutée dans un conteneur **Docker**, afin de faciliter le déploiement et de garantir un environnement d'exécution reproductible.
+
+Le conteneur permet notamment de regrouper les dépendances nécessaires au fonctionnement de l'API et du chatbot.
+
+**Lancement de l'API**
+- `Sans Docker`: depuis la racine du projet: 
+`uvicorn api.api_rag:app --reload`, sur `http://localhost:8000`. 
+
+La documentation interactive Swagger est disponible sur 
+`http://localhost:8000/docs`
+
+- `Avec Docker`:
+
+L'image Docker peut être construite avec: `docker build -t pulsevent-rag .`
+
+Puis créer le conteneur et le lancer avec: `docker run --pulsevent-rag-container -p 7860:7860 -e PULSEVENT-MISTRAL.KEY="%PULSEVENT_MISTRAL_KEY% pulsevent-rag:latest`.
+
+L'API est alors accessible sur `http://localhost:7860/docs`.
 
 ### Endpoints disponibles
 
@@ -244,31 +311,3 @@ Endpoint: ***POST/rebuild***
 
 `json
 {"statut": "Index reconstruit avec succès"}`
-
-
-````markdown
-## Interface utilisateur avec Streamlit
-
-Une interface graphique a été développée avec Streamlit afin de rendre l'utilisation du chatbot plus intuitive.
-
-L'application permet:
-
-- de dialoguer avec le chatbot via une interface conversationnelle
-- d'afficher les évènements sous forme de cartes interactives
-- de conserver l'historique des échanges durant la session
-- d'interroger directement l'API REST.
-
-Les évènements proposés sont automatiquement affichés avec:
-
-- leur titre
-- leur ville
-- leur date
-- leur lieu
-- un lien vers la page officielle OpenAgenda.
-
-### Lancement de l'application
-
-Après avoir lancé l'API FastAPI, lancer l'interface Streamlit:
-
-```bash
-streamlit scripts/run rag_streamlit.py
