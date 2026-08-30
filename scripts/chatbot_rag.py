@@ -14,7 +14,7 @@ import faiss
 from datetime import datetime
 import time
 from dotenv import load_dotenv
-from mistralai.client import Mistral
+from mistralai import Mistral
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_mistralai import ChatMistralAI, MistralAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -64,7 +64,7 @@ def load_faiss_index():
 # Configuration de la connexion à l'API Mistral
 embed_client = Mistral(api_key=api_key)
 model_embed = "mistral-embed"
-model_llm = "mistral-large-latest"
+model_llm = "mistral-small-latest"
 
 if os.getenv("CI") == "true":
     class MockEmbeddings:
