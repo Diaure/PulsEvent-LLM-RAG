@@ -1,16 +1,4 @@
 .env
 .git
-.venv/
-.streamlit-venv/
-__pycache__/
+__pycache__
 *.pyc
-*.pyo
-*.pyd
-.pytest_cache/
-.mypy_cache/
-.vscode/
-.idea/
-.gitignore
-README*
-*.md
-*.ipynb
